@@ -7,10 +7,10 @@
 //
 
 #import "DeploymentViewController.h"
-#import "Rigablue/RigDeviceRequest.h"
-#import "Rigablue/RigLeDiscoveryManager.h"
-#import "Rigablue/RigLeConnectionManager.h"
-#import "Rigablue/RigLeBaseDevice.h"
+#import "Rigablue/Rigablue.h"
+//#import "Rigablue/RigLeDiscoveryManager.h"
+//#import "Rigablue/RigLeConnectionManager.h"
+//#import "Rigablue/RigLeBaseDevice.h"
 #import "Rigablue/RigFirmwareUpdateManager.h"
 #import "SVProgressHUD.h"
 #import <CoreBluetooth/CoreBluetooth.h>
