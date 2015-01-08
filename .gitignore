@@ -1,0 +1,7 @@
+*.xcuserstate
+*.xcbkptlist
+*.xcexplist
+.DS_Store
+xcshareddata/
+xcuserdata/
+project.xcworkspace/
