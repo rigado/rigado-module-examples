@@ -9,7 +9,7 @@ Rigado Module Examples
 
 ### How do I get set up? ###
 
-* This repository requires the use of submodules.  It must be cloned using the --recursive option to ensure all submodules are initialized.  Note that one of these submodules is the Rigablue library which is a private repository.  Ask @estutzenberger for access if necessary.
+* This repository requires the use of submodules.  It must be cloned using the --recursive option to ensure all submodules are initialized.  Note that one of these submodules is the Rigablue library which is a private repository.  Ask an admin for access if not granted with access to this repository.
 
 * Dependencies
     + Rigablue
@@ -23,7 +23,7 @@ If you are adding to the examples app sections, please be sure to keep all submo
 ### Who do I talk to? ###
 
 * Repo owner or admin
-estutzenberger, Rigado, LLC
+estutzenberger, jrigling, Rigado, LLC
 
 * Other community or team contact
 None at this time
