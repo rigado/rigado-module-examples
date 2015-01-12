@@ -8,9 +8,6 @@
 
 #import "DeploymentViewController.h"
 #import "Rigablue/Rigablue.h"
-//#import "Rigablue/RigLeDiscoveryManager.h"
-//#import "Rigablue/RigLeConnectionManager.h"
-//#import "Rigablue/RigLeBaseDevice.h"
 #import "Rigablue/RigFirmwareUpdateManager.h"
 #import "SVProgressHUD.h"
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -112,10 +109,12 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     /* TODO: Add custom service UUID to search list.  You can remove BMDware if you want */
     NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], [CBUUID UUIDWithString:BMDWARE_SERVICE], nil];
     RigDeviceRequest *request = [RigDeviceRequest deviceRequestWithUuidList:uuidList timeout:20.0f delegate:self allowDuplicates:NO];
+    [self showHudWithStatus:@"Searching..."];
+    
     /* Note: Make find connected devices an option so that order of operations doesn't matter here */
     [[RigLeDiscoveryManager sharedInstance] discoverDevices:request];
     [[RigLeDiscoveryManager sharedInstance] findConnectedDevices:request];
-    [self showHudWithStatus:@"Searching..."];
+    
 }
 
 - (void)showHudWithStatus:(NSString*)status
@@ -382,7 +381,8 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
             isConnectionInProgress = YES;
             isAlreadyBootloader = NO;
             [[RigLeDiscoveryManager sharedInstance] stopDiscoveringDevices];
-            [[RigLeConnectionManager sharedInstance] connectDevice:potentialDevice connectionTimeout:5.0f];
+            [NSThread sleepForTimeInterval:0.100];
+            [[RigLeConnectionManager sharedInstance] connectDevice:potentialDevice connectionTimeout:10.0f];
             hudStatus = @"Connecting...";
         } else {
             isAlreadyBootloader = YES;
@@ -392,13 +392,13 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
                 isConnectionInProgress = YES;
                 [[RigLeDiscoveryManager sharedInstance] stopDiscoveringDevices];
                 [NSThread sleepForTimeInterval:0.100];
-                [[RigLeConnectionManager sharedInstance] connectDevice:potentialDevice connectionTimeout:5.0f];
+                [[RigLeConnectionManager sharedInstance] connectDevice:potentialDevice connectionTimeout:10.0f];
                 hudStatus = @"Connecting...";
             }
         }
     }
     
-    [self performSelectorOnMainThread:@selector(updateHudStatus) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(updateHudStatus) withObject:nil waitUntilDone:YES];
 }
 
 - (void)discoveryDidTimeout
@@ -407,7 +407,7 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
         NSLog(@"Discover timeout occurred, but connection is in progress");
         return;
     }
-    [self performSelectorOnMainThread:@selector(startDiscovery) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(startDiscovery) withObject:nil waitUntilDone:YES];
 }
 
 - (void)bluetoothNotPowered
@@ -431,7 +431,7 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     isConnectionInProgress = NO;
     didCompleteAnUpdate = NO;
     hudStatus = @"Discovering...";
-    [self performSelectorOnMainThread:@selector(updateHudStatus) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(updateHudStatus) withObject:nil waitUntilDone:YES];
 }
 
 - (void)didDisconnectPeripheral:(CBPeripheral *)peripheral
@@ -440,12 +440,12 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     NSLog(@"Disconnect; attempting reconnection");
     isConnectionInProgress = NO;
     updateDevice = nil;
-    [self performSelectorOnMainThread:@selector(clearDeviceData) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(clearDeviceData) withObject:nil waitUntilDone:YES];
     if (didUpdateThroughBootloader) {
         [NSThread sleepForTimeInterval:12.0f];
         didUpdateThroughBootloader = NO;
     }
-    [self performSelectorOnMainThread:@selector(startDiscovery) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(startDiscovery) withObject:nil waitUntilDone:YES];
 }
 
 - (void)deviceConnectionDidFail:(RigAvailableDeviceData *)device
@@ -456,6 +456,10 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
 - (void)deviceConnectionDidTimeout:(RigAvailableDeviceData *)device
 {
     isConnectionInProgress = NO;
+    NSLog(@"Connected timed out");
+    hudStatus = @"Searching...";
+    [self performSelectorOnMainThread:@selector(updateHudStatus) withObject:nil waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(startDiscovery) withObject:nil waitUntilDone:YES];
 }
 
 #pragma mark -
@@ -540,11 +544,13 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     didCompleteAnUpdate = YES;
     
     currentStatus = @"Update Complete!";
-    [self performSelectorOnMainThread:@selector(finalizeUpdate) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(finalizeUpdate) withObject:nil waitUntilDone:YES];
 }
 
 - (void)updateFailed:(NSString*)status errorCode:(RigDfuError_t)error
 {
-    
+    currentProgress = 0.0f;
+    isUpdateInProgress = NO;
+    didCompleteAnUpdate = NO;
 }
 @end
