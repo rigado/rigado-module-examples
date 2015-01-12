@@ -5,9 +5,7 @@ Rigado Module Examples
 ### What is this repository for? ###
 
 * Quick summary
-This repository provides a selection of examples for interacting with Rigado modules via iOS and/or Android mobile applications.  It may also eventually include node.js examples for noble (https://github.com/sandeepmistry/noble)
-
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+    + This repository provides a selection of examples for interacting with Rigado modules via iOS and/or Android mobile applications.  It may also eventually include node.js examples for noble (https://github.com/sandeepmistry/noble)
 
 ### How do I get set up? ###
 
