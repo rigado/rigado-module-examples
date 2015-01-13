@@ -1,6 +1,6 @@
 [submodule "rigablue"]
 	path = rigablue
-	url = git@bitbucket.org:estutzenberger/rigablue.git
+	url = git@github.com:rigado/rigablue.git
 [submodule "SVProgressHUD"]
 	path = SVProgressHUD
 	url = git@github.com:TransitApp/SVProgressHUD.git
