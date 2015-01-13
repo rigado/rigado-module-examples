@@ -21,8 +21,7 @@ Rigado Module Examples
 
 ### Contribution guidelines ###
 
-* Contributions
-    + If you are adding to the example app sections, please be sure to keep all submodules up to date and add new ones as needed.
+* If you are adding to the example app sections, please be sure to keep all submodules up to date and add new ones as needed.
 
 ### Who do I talk to? ###
 
