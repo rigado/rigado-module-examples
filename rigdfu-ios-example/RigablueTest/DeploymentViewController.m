@@ -2,9 +2,15 @@
 //  DeploymentViewController.m
 //  RigablueTest
 //
-//  Created by Eric P. Stutzenberger on 9/29/14.
-//  Copyright (c) 2014 Rigado, LLC. All rights reserved.
+//  Created by Eric Stutzenberger on 9/29/14.
+//  Copyright (c) Rigado, LLC. All rights reserved.
 //
+
+/* Steps to get the firmware example working and using your firmware
+   1. Remove any files listed under the Firmware group in the project window to the left.
+   1. Right click on Firmware in the project window and add your *.bin to the project.
+   2. Go through this file and address all TODO comments.
+*/
 
 #import "DeploymentViewController.h"
 #import "Rigablue/Rigablue.h"
@@ -13,26 +19,26 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
+#import <CommonCrypto/CommonCryptor.h>
 
 #define RIGDFU_SERVICE_ID           @"00001530-1212-efde-1523-785feabcd123"
 
-/* TODO:Add your custom UUIDs here */
-#define BMDWARE_SERVICE             @"2413B33F-707F-90BD-2045-2AB8807571B7"
-#define BMDWARE_CONTROL_POINT       @"2413B43F-707F-90BD-2045-2AB8807571B7"
+/* TODO: Update the defineS below for your product's service and characteristic UUID */
+#define RESET_SERVICE        @"2413B33F-707F-90BD-2045-2AB8807571B7"
+/* TODO: Ensure the UUID for this characteristic is the correct UUID for the charracteristic that will accept
+ * a command to reset the device in to the bootloader.  If it doesn't not, this application will not work properly. */
+#define RESET_CHAR           @"2413B43F-707F-90BD-2045-2AB8807571B7"
 
 #define DIS_SERVICE                 @"180A"
 #define MFG_NAME                    @"2A29"
 #define FIRMWARE_VERSION            @"2A26"
 
 /* TODO: If you want to confine your updates to some local area close to your device, then leave this number at something high
- * such as -60 or so.  If you don't want that, you can set it to -128 or something. */
-#define RSSI_UPDATE_THRESHOLD       -60
+ * such as -50 or so.  If you don't want that, you can set it to -128. */
+#define RSSI_UPDATE_THRESHOLD       -50
 
-/* TODO:Update this command to be the command you want to send to make the application the device reboot in to the bootloader.
- * Whatever this command is, it will be written to the characteristic found in the beginDeployment function.  Make sure
- * to update that function with the approrpiate UUID define.
- */
-/* RigCom 0x57305603 */
+/* TODO: Update this command to be the command you want to send to make the application force the device reboot in to the bootloader. 
+ * Whatever this command is, it will be written to the characteristic as defined above. */
 static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
 
 @interface DeploymentViewController () <RigLeDiscoveryManagerDelegate, RigLeConnectionManagerDelegate, RigLeBaseDeviceDelegate, UIPickerViewDataSource, UIPickerViewDelegate, RigFirmwareUpdateManagerDelegate>
@@ -76,9 +82,12 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     
     [RigLeConnectionManager sharedInstance].delegate = self;
     
-    /* TODO: Add your firmware binary to the project.  Then it can be referenced here by name without the extention. */
-    firmwareList = [NSArray arrayWithObjects:@"BMDware Blinky", @"BMDware Blinky Secure", @"BMDware Blinky No Key", nil];
-    firmwareBinaryList = [NSArray arrayWithObjects:@"bmd-ware-eval", @"bmd-ware-secure", @"bmd-ware-no-key", nil];
+    /* TODO: Firmware list will be displayed to the user.  Provide a useful string for the name of the binary. */
+    firmwareList = [NSArray arrayWithObjects:@"My Application", nil];
+    /* TODO: Create an array listing that matches the name of the firmware image added to the project.  The file must be of type .bin
+     * Note: DO NOT add the file extention (e.g. bin) as it will be handled later
+     */
+    firmwareBinaryList = [NSArray arrayWithObjects:@"myapp", nil];
     
     CAGradientLayer *bgLayer = [self blueGradient];
     bgLayer.frame = self.view.bounds;
@@ -106,12 +115,10 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
 
 - (void)startDiscovery
 {
-    /* TODO: Add custom service UUID to search list.  You can remove BMDware if you want */
-    NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], [CBUUID UUIDWithString:BMDWARE_SERVICE], nil];
+    NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], [CBUUID UUIDWithString:RESET_SERVICE], nil];
     RigDeviceRequest *request = [RigDeviceRequest deviceRequestWithUuidList:uuidList timeout:20.0f delegate:self allowDuplicates:NO];
     [self showHudWithStatus:@"Searching..."];
     
-    /* Note: Make find connected devices an option so that order of operations doesn't matter here */
     [[RigLeDiscoveryManager sharedInstance] discoverDevices:request];
     [[RigLeDiscoveryManager sharedInstance] findConnectedDevices:request];
     
@@ -216,7 +223,7 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     NSString *firmwareFile = [firmwareBinaryList objectAtIndex:row];
     
     /* Load firmware image in to local memory */
-    filePath =[[NSBundle mainBundle] pathForResource:firmwareFile ofType:@"bin"];
+    filePath = [[NSBundle mainBundle] pathForResource:firmwareFile ofType:@"bin"];
     firmwareImageData = [NSData dataWithContentsOfFile:filePath];
     
     updateManager = [[RigFirmwareUpdateManager alloc] init];
@@ -234,8 +241,8 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     CBCharacteristic *controlPoint = nil;
     
     /* TODO: Update to use your service and characteristic UUIDs */
-    CBUUID *serviceUuid = [CBUUID UUIDWithString:BMDWARE_SERVICE];
-    CBUUID *controlPointUuid = [CBUUID UUIDWithString:BMDWARE_CONTROL_POINT];
+    CBUUID *serviceUuid = [CBUUID UUIDWithString:RESET_SERVICE];
+    CBUUID *controlPointUuid = [CBUUID UUIDWithString:RESET_CHAR];
     
     for (CBService *svc in [updateDevice getSerivceList]) {
         if ([svc.UUID isEqual:serviceUuid]) {
@@ -373,10 +380,10 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     }
     
     /* Here, we ensure the device is in relatively close proximity to the iOS device */
-    //TODO: This RSSI check can be removed if you like.  It is here so that I can force update to occur on devices that are local
-    //to my desk rather than finding anything in the office that's floating around.
+    //TODO: This RSSI check can be removed if you like.  It is here so that we can force updates to occur on devices that are in close
+    //to proximity to the mobile device rather than finding other devices that may be advertising.
     if (potentialDevice.rssi.integerValue > RSSI_UPDATE_THRESHOLD) {
-        if (![potentialDevice.peripheral.name isEqual:@"RigDfu"] && potentialDevice.rssi.integerValue > -60) {
+        if (![potentialDevice.peripheral.name isEqual:@"RigDfu"]) {
             NSLog(@"Connecting to %@", potentialDevice.peripheral.name);
             isConnectionInProgress = YES;
             isAlreadyBootloader = NO;
