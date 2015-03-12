@@ -35,7 +35,7 @@
 
 /* TODO: If you want to confine your updates to some local area close to your device, then leave this number at something high
  * such as -50 or so.  If you don't want that, you can set it to -128. */
-#define RSSI_UPDATE_THRESHOLD       -50
+#define RSSI_UPDATE_THRESHOLD       -128
 
 /* TODO: Update this command to be the command you want to send to make the application force the device reboot in to the bootloader. 
  * Whatever this command is, it will be written to the characteristic as defined above. */
@@ -83,11 +83,11 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     [RigLeConnectionManager sharedInstance].delegate = self;
     
     /* TODO: Firmware list will be displayed to the user.  Provide a useful string for the name of the binary. */
-    firmwareList = [NSArray arrayWithObjects:@"My Application", nil];
+    firmwareList = [NSArray arrayWithObjects:@"BMDware Eval", nil];
     /* TODO: Create an array listing that matches the name of the firmware image added to the project.  The file must be of type .bin
      * Note: DO NOT add the file extention (e.g. bin) as it will be handled later
      */
-    firmwareBinaryList = [NSArray arrayWithObjects:@"myapp", nil];
+    firmwareBinaryList = [NSArray arrayWithObjects:@"bmd-ware-no-key", nil];
     
     CAGradientLayer *bgLayer = [self blueGradient];
     bgLayer.frame = self.view.bounds;
@@ -115,7 +115,7 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
 
 - (void)startDiscovery
 {
-    NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], [CBUUID UUIDWithString:RESET_SERVICE], nil];
+    NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], /*[CBUUID UUIDWithString:RESET_SERVICE],*/ nil];
     RigDeviceRequest *request = [RigDeviceRequest deviceRequestWithUuidList:uuidList timeout:20.0f delegate:self allowDuplicates:NO];
     [self showHudWithStatus:@"Searching..."];
     
