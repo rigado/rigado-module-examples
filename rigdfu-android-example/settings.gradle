@@ -1,0 +1,2 @@
+include ':app', ':rigablue'
+project(':rigablue').projectDir=new File('../rigablue/Android/rigablue')

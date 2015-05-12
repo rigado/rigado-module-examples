@@ -1,0 +1,76 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".ActivityMain">
+
+    <TextView
+        android:id="@+id/id_tv_device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/txt_default_device_name"
+        android:layout_centerHorizontal="true"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:layout_marginTop="30dp"/>
+
+    <TextView
+        android:id="@+id/id_tv_mfg_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/id_tv_device_name"
+        android:text="@string/txt_default_mfg_name"
+        android:layout_centerHorizontal="true"
+        android:singleLine="true"
+        android:layout_marginTop="15dp" />
+
+    <!-- read-only selection -->
+    <NumberPicker
+        android:id="@+id/id_picker_firmware"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/id_tv_mfg_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:descendantFocusability="blocksDescendants"/>
+
+    <Button
+        android:id="@+id/id_btn_begin_deploy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/txt_btn_deploy"
+        android:layout_below="@+id/id_picker_firmware"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:id="@+id/id_progress_deployment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/id_btn_begin_deploy"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
+
+    <TextView
+        android:id="@+id/id_tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/txt_tv_status_idle"
+        android:layout_below="@+id/id_progress_deployment"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+
+
+
+</RelativeLayout>

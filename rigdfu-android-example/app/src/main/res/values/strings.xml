@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Rigado BTLE Sample</string>
+
+    <string name="txt_error_device_not_connected">Please connect to the device first</string>
+    <string name="txt_error_btnotsupported">Bluetooth Not Supported</string>
+
+    <string name="txt_status_connected">Connected</string>
+    <string name="txt_status_disconnected">Disconnected</string>
+    <string name="txt_status_timeout">Timeout</string>
+
+    <string name="txt_menu_find">Connect BTLE device</string>
+
+    <string name="txt_btn_deploy">Begin Deployment</string>
+    <string name="txt_tv_status_idle">Idle</string>
+
+    <string name="txt_default_device_name">Unknown Device</string>
+    <string name="txt_default_mfg_name">Unknown Mfg</string>
+
+</resources>

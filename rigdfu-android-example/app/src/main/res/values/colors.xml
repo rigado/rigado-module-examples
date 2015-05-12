@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- colors used in the themes.xml -->
+    <color name="colorPrimary">@color/material_deep_teal_500</color>
+    <color name="colorSecondary">@color/material_deep_teal_200</color>
+    <color name="colorBackground">@color/material_blue_grey_500</color>
+
+    <!-- custom color definitions -->
+    <color name="material_blue_grey_500">#607D8B</color>
+</resources>
