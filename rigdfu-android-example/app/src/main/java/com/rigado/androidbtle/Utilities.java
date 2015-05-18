@@ -58,13 +58,12 @@ public class Utilities {
         return strMfgName == null ? strUnknown : strMfgName;// on null return strUnknown
     }
 
-    public void startFirmwareUpdate(Context context, RigFirmwareUpdateManager fwManager, RigLeBaseDevice device, JsonFirmwareType firmwareRecord,
-                                    BluetoothGattCharacteristic bootCharacteristic, byte [] bootCommand) {
+    public void startFirmwareUpdate(Context context, RigFirmwareUpdateManager fwManager, RigLeBaseDevice device, JsonFirmwareType firmwareRecord) {
 
         if (firmwareRecord != null){
 
             final String filename1 = firmwareRecord.getProperties().getFilename1();
-            //final String filename2 = firmwareRecord.getProperties().getFilename2();
+            final String filename2 = firmwareRecord.getProperties().getFilename2();
 
             // ensure that the filenames contain no extension
             String strFilenameNoExt1;
@@ -74,21 +73,21 @@ public class Utilities {
                 strFilenameNoExt1 = filename1;
             }
 
-//            String strFilenameNoExt2;
-//            if (filename1.contains(".")) {
-//                strFilenameNoExt2 = filename2.substring(0, filename2.lastIndexOf('.'));
-//            } else {
-//                strFilenameNoExt2 = filename2;
-//            }
+            String strFilenameNoExt2;
+            if (filename1.contains(".")) {
+                strFilenameNoExt2 = filename2.substring(0, filename2.lastIndexOf('.'));
+            } else {
+                strFilenameNoExt2 = filename2;
+            }
 
-            final int deviceFWid = context.getResources().getIdentifier(strFilenameNoExt1, "raw", context.getPackageName());
-            //final int deviceControllerFWid = context.getResources().getIdentifier(strFilenameNoExt2, "raw", context.getPackageName());
+            final int deviceRadioFWid = context.getResources().getIdentifier(strFilenameNoExt1, "raw", context.getPackageName());
+            final int deviceControllerFWid = context.getResources().getIdentifier(strFilenameNoExt2, "raw", context.getPackageName());
 
-            InputStream fwImageInputStream = (deviceFWid != 0) ? context.getResources().openRawResource(deviceFWid) : null;
-            //InputStream fwControllerImageInputStream = (deviceControllerFWid != 0) ? context.getResources().openRawResource(deviceControllerFWid) : null;
+            InputStream fwRadioImageInputStream = (deviceRadioFWid != 0) ? context.getResources().openRawResource(deviceRadioFWid) : null;
+            InputStream fwControllerImageInputStream = (deviceControllerFWid != 0) ? context.getResources().openRawResource(deviceControllerFWid) : null;
 
             //TODO this needs fixing
-            fwManager.updateFirmware(device, fwImageInputStream, bootCharacteristic, bootCommand);//radio or controller images could be null
+            fwManager.updateFirmware(device, fwRadioImageInputStream, fwControllerImageInputStream);//radio or controller images could be null
         } else {
             Log.e(TAG, "Firmware filenames are unknown - were the JSON values read correctly?");
         }

@@ -28,7 +28,6 @@ import com.rigado.rigablue.RigLeDiscoveryManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 public class ActivityMain extends ActionBarActivity
@@ -41,16 +40,10 @@ public class ActivityMain extends ActionBarActivity
     // constants
     private final String TAG = getClass().getSimpleName();
     private final static String BTLE_SERVICE_UUID = "00001530-1212-efde-1523-785feabcd123";
-
     private final static int BTLE_SEARCH_TIMEOUT_MS = 20000;//20sec
     private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10sec
     private final static String BTLE_DEFAULT_DEVICE_NAME = "RigDfu";
     private final static int RSSI_UPDATE_THRESHOLD = -128;
-
-    private final static String RESET_SERVICE_UUID_STRING = "2413B33F-707F-90BD-2045-2AB8807571B7";
-    private final static String RESET_CHARACTERISTIC_UUID_STRING = "2413B43F-707F-90BD-2045-2AB8807571B7";
-
-    private final static byte [] bootloader_command = { 0x03, 0x56, 0x30, 0x57 };
 
     // members
     private RigFirmwareUpdateManager mRigFirmwareUpdateManager;
@@ -69,7 +62,6 @@ public class ActivityMain extends ActionBarActivity
     private TextView mTextViewDeviceName;
     private TextView mTextViewManufacturerName;
     private Button mButtonDeploy;
-    private boolean mIsUpdateInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +78,11 @@ public class ActivityMain extends ActionBarActivity
         mTextViewDeviceName = (TextView) findViewById(R.id.id_tv_device_name);
         mTextViewManufacturerName = (TextView) findViewById(R.id.id_tv_mfg_name);
         mButtonDeploy = (Button) findViewById(R.id.id_btn_begin_deploy);
-        mIsUpdateInProgress = false;
 
         mButtonDeploy.setOnClickListener(this);
+
+        // initialize FW Manager
+        mRigFirmwareUpdateManager = new RigFirmwareUpdateManager();
 
         // read list of available firmwares - these are listed in res/raw/firmware_descriptions.json
         mJsonFirmwareReader = new JsonFirmwareReader();
@@ -148,33 +142,7 @@ public class ActivityMain extends ActionBarActivity
                 // get selected firmware from picker
                 final int selectedIndex = mFirmwarePicker.getValue();
                 final JsonFirmwareType firmwareRecord = mJsonFirmwareTypeList.get(selectedIndex);
-                // initialize FW Manager
-                mRigFirmwareUpdateManager = new RigFirmwareUpdateManager();
-                mRigFirmwareUpdateManager.setObserver(this);
-
-                BluetoothGattService resetService = null;
-                BluetoothGattCharacteristic resetChar = null;
-
-                for(BluetoothGattService service : mRigLeBaseDevice.getServiceList()) {
-                    if(service.getUuid().equals(UUID.fromString(RESET_SERVICE_UUID_STRING))) {
-                        resetService = service;
-                        break;
-                    }
-                }
-
-                if(resetService == null) {
-                    Toast.makeText(getApplicationContext(), "Bluetooth service for Reset command not found!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                resetChar = resetService.getCharacteristic(UUID.fromString(RESET_CHARACTERISTIC_UUID_STRING));
-                if(resetChar == null) {
-                    Toast.makeText(getApplicationContext(), "Bluetooth characteristic for Reset command not found!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                mUtilities.startFirmwareUpdate(this, mRigFirmwareUpdateManager, mRigLeBaseDevice, firmwareRecord, resetChar, bootloader_command);
-                mIsUpdateInProgress = true;
+                mUtilities.startFirmwareUpdate(this, mRigFirmwareUpdateManager, mRigLeBaseDevice, firmwareRecord);
             }
         }
     }
@@ -204,7 +172,7 @@ public class ActivityMain extends ActionBarActivity
     }
 
     public void discoverStartBTLEdevice(int timeout) {
-        RigDeviceRequest request = new RigDeviceRequest(new String[] { BTLE_SERVICE_UUID, RESET_SERVICE_UUID_STRING }, timeout);
+        RigDeviceRequest request = new RigDeviceRequest(new String[] { BTLE_SERVICE_UUID }, timeout);
         request.setObserver(this);
         RigLeDiscoveryManager.getInstance().startDiscoverDevices(request);
         // NOTE: next expected callback to trigger is likely to be didDiscoverDevice()
@@ -250,7 +218,6 @@ public class ActivityMain extends ActionBarActivity
 
         // reset the UI and state for next firmware programming
         mLastProgressIndication = -1;
-        mIsUpdateInProgress = false;
         showStatus(R.string.txt_tv_status_idle);
     }
 
@@ -287,24 +254,6 @@ public class ActivityMain extends ActionBarActivity
     @Override
     public void discoveryDidComplete(RigLeBaseDevice device) {
         Log.d(TAG, "discoveryDidComplete");
-        // update UI with device name
-        mTextViewDeviceName.post(new Runnable() {
-            @Override
-            public void run() {
-                mTextViewDeviceName.setText(mRigLeBaseDevice.getName());
-            }
-        });
-
-        //update UI with device manufacturer
-        final String strMfgName = mUtilities.getManufacturerName(mRigLeBaseDevice);
-        mTextViewManufacturerName.post(new Runnable() {
-            @Override
-            public void run() {
-                mTextViewManufacturerName.setText(strMfgName);
-            }
-        });
-
-        showStatus(R.string.txt_status_connected);
     }
     // end: Concrete implementations for the IRigLeBaseDeviceObserver interface
 
@@ -317,20 +266,29 @@ public class ActivityMain extends ActionBarActivity
 
         // store connected device for later
         mRigLeBaseDevice = device;
-        mRigLeBaseDevice.setObserver(this);
-        mRigLeBaseDevice.runDiscovery();
 
+        // update UI with device name
+        mTextViewDeviceName.post(new Runnable() {
+            @Override
+            public void run() {
+                mTextViewDeviceName.setText(device.getName());
+            }
+        });
 
+        //update UI with device manufacturer
+        final String strMfgName = mUtilities.getManufacturerName(device);
+        mTextViewManufacturerName.post(new Runnable() {
+            @Override
+            public void run() {
+                mTextViewManufacturerName.setText(strMfgName);
+            }
+        });
+
+        showStatus(R.string.txt_status_connected);
     }
 
     @Override
     public void didDisconnectDevice(BluetoothDevice btDevice) {
-        if(mIsUpdateInProgress) {
-            /* When update is in progress, ignore this message since the disconnect is due to
-             * resetting in to the bootloader.
-             */
-             return;
-        }
         mIsConnectionInProgress = false;
         mRigLeBaseDevice = null;
 
@@ -379,14 +337,14 @@ public class ActivityMain extends ActionBarActivity
         if (device.getRssi() > RSSI_UPDATE_THRESHOLD) {
 
             // for demo purposes, only connected to "RigDfu" device
-            //if (device.getBluetoothDevice().getName().equals(BTLE_DEFAULT_DEVICE_NAME)) {
+            if (device.getBluetoothDevice().getName().equals(BTLE_DEFAULT_DEVICE_NAME)) {
 
                 // automatically connect
                 mIsConnectionInProgress = true;
 
                 RigLeConnectionManager.getInstance().connectDevice(device, BTLE_CONNECT_TIMEOUT_MS);
                 //NOTE: next expected callback to trigger is likely to be didConnectDevice()
-            //}
+            }
         }
     }
 
