@@ -47,6 +47,7 @@ public class RigCoreBluetooth implements IRigCoreListener {
             Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> mConnectionFuture;
     private static ScheduledFuture<?> mDiscoveryFuture;
+    private static ScheduledFuture<?> mOpFuture;
 
     RigCoreBluetooth() {
         mContext = null;
@@ -91,6 +92,18 @@ public class RigCoreBluetooth implements IRigCoreListener {
             }
         };
         mDiscoveryFuture = discoveryWorker.schedule(task, timeout, TimeUnit.MILLISECONDS);
+
+    }
+
+    void scheduleOpTimeout(long timeout) {
+
+        Runnable task = new Runnable() {
+            public void run() {
+                mIsDataOpInProgress = false;
+                nextOp();
+            }
+        };
+        mOpFuture = discoveryWorker.schedule(task, timeout, TimeUnit.MILLISECONDS);
 
     }
 
@@ -170,7 +183,7 @@ public class RigCoreBluetooth implements IRigCoreListener {
 
         mIsDiscovering = false;
 
-        if(!mDiscoveryFuture.isDone()) {
+        if(mDiscoveryFuture != null && !mDiscoveryFuture.isDone()) {
             mDiscoveryFuture.cancel(true);
         }
 
@@ -257,12 +270,21 @@ public class RigCoreBluetooth implements IRigCoreListener {
     }
 
     private synchronized void doOp(IRigDataRequest request) {
+    	mIsDataOpInProgress = true;
         request.post(mBluetoothLeService);
+        scheduleOpTimeout(2000);
     }
 
     private synchronized void nextOp() {
         if(!mOpsQueue.isEmpty() && !mIsDataOpInProgress) {
+            cancelOpTimeout();
             doOp(mOpsQueue.poll());
+        }
+    }
+
+    private synchronized void cancelOpTimeout() {
+        if(mOpFuture != null && !mOpFuture.isCancelled()) {
+            mOpFuture.cancel(true);
         }
     }
 
@@ -443,6 +465,8 @@ public class RigCoreBluetooth implements IRigCoreListener {
         RigLog.d("__RigCoreBluetooth.onActionGattDisconnected__ : " + bluetoothDevice.getAddress());
 
         mConnectionObserver.didDisconnectDevice(bluetoothDevice);
+        mIsDataOpInProgress = false;
+        mOpsQueue.clear();
     }
 
     @Override
@@ -465,6 +489,7 @@ public class RigCoreBluetooth implements IRigCoreListener {
     public void onActionGattDataAvailable(BluetoothGattCharacteristic characteristic, BluetoothDevice bluetoothDevice) {
         RigLog.d("__RigCoreBluetooth.onActionGattDataAvailable__");
         mIsDataOpInProgress = false;
+        cancelOpTimeout();
         RigLeBaseDevice baseDevice = getRigLeBaseDeviceForBluetoothDevice(bluetoothDevice);
         if (baseDevice != null) {
             baseDevice.didUpdateValue(bluetoothDevice, characteristic);
@@ -486,6 +511,7 @@ public class RigCoreBluetooth implements IRigCoreListener {
     {
         RigLog.d("__RigCoreBluetooth.onActionGattCharWrite__");
         mIsDataOpInProgress = false;
+        cancelOpTimeout();
         RigLeBaseDevice baseDevice = getRigLeBaseDeviceForBluetoothDevice(bluetoothDevice);
         if(baseDevice != null) {
             baseDevice.didWriteValue(bluetoothDevice, characteristic);
@@ -497,6 +523,7 @@ public class RigCoreBluetooth implements IRigCoreListener {
     public void onActionGattDescriptorWrite(BluetoothGattDescriptor descriptor, BluetoothDevice bluetoothDevice) {
         RigLog.d("__RigCoreBluetooth.onActionGattDescriptorWrite__");
         mIsDataOpInProgress = false;
+        cancelOpTimeout();
         /* This should be called when the notification state changes */
         RigLeBaseDevice baseDevice = getRigLeBaseDeviceForBluetoothDevice(bluetoothDevice);
         if (baseDevice != null) {

@@ -12,9 +12,19 @@ import java.util.UUID;
  */
 public class RigFirmwareUpdateService implements IRigLeConnectionManagerObserver, IRigLeBaseDeviceObserver{
 
-    private static final String kLumenplayDFUServiceUuidString = "00001530-eb68-4181-a6df-42562b7fef98";
-    private static final String kLumenplayDFUControlPointUuidString = "00001531-eb68-4181-a6df-42562b7fef98";
-    private static final String kLumenplayDFUPacketCharUuidString = "00001532-eb68-4181-a6df-42562b7fef98";
+//    private static final String kupdateDfuServiceUuidString = "00001530-eb68-4181-a6df-42562b7fef98";
+//    private static final String kupdateDfuControlPointUuidString = "00001531-eb68-4181-a6df-42562b7fef98";
+//    private static final String kupdateDfuPacketCharUuidString = "00001532-eb68-4181-a6df-42562b7fef98";
+    
+	private static final String kupdateDfuServiceUuidString = "00001530-1212-efde-1523-785feabcd123";
+    private static final String kupdateDfuControlPointUuidString = "00001531-1212-efde-1523-785feabcd123";
+    private static final String kupdateDfuPacketCharUuidString = "00001532-1212-efde-1523-785feabcd123";
+  
+	private static final String kDisUuidString = "0000180a-0000-1000-8000-00805f9b34fb";
+    private static final String kDisFwVersionUuidString = "00002a27-0000-1000-8000-00805f9b34fb";
+    private static final String kDisModelNumberUuidString = "00002a24-0000-1000-8000-00805f9b34fb";
+    
+    private static final String kSecureBootloaderModelNumber = "Rigado Secure DFU";
 
     RigAvailableDeviceData mAvailDevice;
     RigLeBaseDevice mUpdateDevice;
@@ -24,6 +34,10 @@ public class RigFirmwareUpdateService implements IRigLeConnectionManagerObserver
     BluetoothGattService mDfuService;
     BluetoothGattCharacteristic mControlPoint;
     BluetoothGattCharacteristic mPacketChar;
+    
+    BluetoothGattService mDisService;
+    BluetoothGattCharacteristic mDisFirmwareVersionChar;
+    BluetoothGattCharacteristic mDisModelNumberChar;
 
     IRigLeConnectionManagerObserver mOldConnectionObserver;
     IRigFirmwareUpdateServiceObserver mObserver;
@@ -31,16 +45,22 @@ public class RigFirmwareUpdateService implements IRigLeConnectionManagerObserver
     int mReconnectAttempts;
     boolean mShouldReconnectToDevice;
     boolean mAlwaysReconnectOnDisconnect;
+    boolean mIsSecureDfu;
 
     public RigFirmwareUpdateService() {
         mOldConnectionObserver = RigLeConnectionManager.getInstance().getObserver();
         RigLeConnectionManager.getInstance().setObserver(this);
         mReconnectAttempts = 0;
         mShouldReconnectToDevice = false;
+        mIsSecureDfu = false;
     }
 
     public void setObserver(IRigFirmwareUpdateServiceObserver observer) {
         mObserver = observer;
+    }
+    
+    public String getDfuServiceUuidString() {
+    	return kupdateDfuServiceUuidString;
     }
 
     public void setShouldReconnectState(boolean state) {
@@ -98,21 +118,31 @@ public class RigFirmwareUpdateService implements IRigLeConnectionManagerObserver
     }
 
     public boolean getServiceAndCharacteristics() {
-        UUID dfuServiceUuid = UUID.fromString(kLumenplayDFUServiceUuidString);
-        UUID controlPointUuid = UUID.fromString(kLumenplayDFUControlPointUuidString);
-        UUID packetUuid = UUID.fromString(kLumenplayDFUPacketCharUuidString);
+        UUID dfuServiceUuid = UUID.fromString(kupdateDfuServiceUuidString);
+        UUID controlPointUuid = UUID.fromString(kupdateDfuControlPointUuidString);
+        UUID packetUuid = UUID.fromString(kupdateDfuPacketCharUuidString);
+        
+        UUID disServiceUuid = UUID.fromString(kDisUuidString);
+        UUID disFwVersionUuid = UUID.fromString(kDisFwVersionUuidString);
+        UUID disModelNumberUuid = UUID.fromString(kDisModelNumberUuidString);
 
         mDfuService = null;
         for(BluetoothGattService service : mUpdateDevice.getServiceList()) {
             if(service.getUuid().equals(dfuServiceUuid)) {
                 mDfuService = service;
-                break;
+            } else if(service.getUuid().equals(disServiceUuid)) {
+            	mDisService = service;
             }
         }
 
         if(mDfuService == null) {
             RigLog.e("Did not find Dfu Service!");
             return false;
+        }
+        
+        if(mDisService == null) {
+        	RigLog.e("Did not find Dis service for Bootloader");
+        	return false;
         }
 
         for(BluetoothGattCharacteristic characteristic : mDfuService.getCharacteristics()) {
@@ -127,8 +157,25 @@ public class RigFirmwareUpdateService implements IRigLeConnectionManagerObserver
             RigLog.e("One or more dfu characteristics missing!");
             return false;
         }
+        
+        for(BluetoothGattCharacteristic characteristic : mDisService.getCharacteristics()) {
+        	if(characteristic.getUuid().equals(disFwVersionUuid)) {
+        		mDisFirmwareVersionChar = characteristic;
+        	} else if(characteristic.getUuid().equals(disModelNumberUuid)) {
+        		mDisModelNumberChar = characteristic;
+        	}
+        }
+        
+        String modelNumber = mDisModelNumberChar.getStringValue(0);
+        if(modelNumber.equals(kSecureBootloaderModelNumber)) {
+        	mIsSecureDfu = true;
+        }
 
         return true;
+    }
+    
+    public boolean isSecureDfu() {
+    	return mIsSecureDfu;
     }
 
     public void disconnectDevice() {

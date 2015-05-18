@@ -24,7 +24,7 @@ enum FirmwareUpdateTypeEnum {
 enum DfuOpCodeEnum {
     DfuOpCode_Reserved_0,
     DfuOpCode_Start,
-    DfuOpCode_Reserved_2,
+    DfuOpCode_Init,
     DfuOpCode_ReceiveFirmwareImage,
     DfuOpCode_ValidateFirmwareImage,
     DfuOpCode_ActivateFirmwareImage,
@@ -60,23 +60,21 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
     private static final int OperationSuccess = 1;
 
     private static final int BytesInOnePacket = 20;
+    
+    private static final int ImageStartIndex = 0;
+    private static final int ImageStartPacketSize = 12;
+    private static final int ImageInitPacketIndex = ImageStartPacketSize;
+    private static final int ImageInitPacketSize = 32;
+    private static final int ImageSecureDataStart = ImageInitPacketIndex + ImageInitPacketSize;
 
-    private static final String LumenplayServiceUuidString = "9a143caf-d775-4cfb-9eca-6e3a9b0f966b";
-    private static final String LumenplayControlPointUuidString = "9a143cbe-d775-4cfb-9eca-6e3a9b0f966b";
-    private static final String RigDfuServiceUuidString = "00001530-eb68-4181-a6df-42562b7fef98";
-
+    private RigFirmwareUpdateService mFirmwareUpdateService;
     private FirmwareManagerStateEnum mState;
-
-    byte [] mRadioImage;
-    int mRadioImageSize;
-
-    byte [] mControllerImage;
-    int mControllerImageSize;
 
     byte [] mImage;
     int mImageSize;
 
     boolean mIsFileSizeWritten;
+    boolean mIsInitPacketSent;
     boolean mIsPacketNotificationEnabled;
     boolean mIsReceivingFirmwareImage;
     boolean mIsLastPacket;
@@ -92,7 +90,6 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
     int mTotalBytesErased;
     int mLastPacketSize;
 
-    private RigFirmwareUpdateService mFirmwareUpdateService;
     private IRigFirmwareUpdateManagerObserver mObserver;
 
     IRigLeConnectionManagerObserver mOldConnectionObserver;
@@ -100,31 +97,24 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
     String mInitialDeviceAddress;
 
     public RigFirmwareUpdateManager() {
-
+    	initStateVariables();
     }
 
-    public boolean updateFirmware(RigLeBaseDevice device, InputStream radioImageStream,
-                                    InputStream controllerImageStream) {
+    public boolean updateFirmware(RigLeBaseDevice device, InputStream firmwareImage, BluetoothGattCharacteristic activateCharacteristic,
+    		byte[] activateCommand) {
         //BufferedReader radioStreamReader = new BinaryReader(new InputStreamReader(radioImageStream));
         RigLog.i("__RigFirmwareUpdateManager.updateFirmware__");
         mUpdateDevice = device;
         try {
-            mRadioImageSize = radioImageStream.available();
-            mRadioImage = new byte[mRadioImageSize];
-            radioImageStream.read(mRadioImage);
-
-            mControllerImageSize = controllerImageStream.available();
-            mControllerImage = new byte[mControllerImageSize];
-            controllerImageStream.read(mControllerImage);
-
-            mImageSize = mControllerImageSize;
-            mImage = mControllerImage;
+            mImageSize = firmwareImage.available();
+            mImage = new byte[mImageSize];
+            firmwareImage.read(mImage);
         } catch(IOException e) {
             RigLog.e("IOException occurred while reading binary image data!");
         }
 
-        mImage = new byte[mControllerImageSize];
-        System.arraycopy(mControllerImage, 0, mImage, 0, mControllerImageSize);
+//        mImage = new byte[mControllerImageSize];
+//        System.arraycopy(mControllerImage, 0, mImage, 0, mControllerImageSize);
 
         //TODO: Remove this
 //        UUID lumenplayServiceUuid = UUID.fromString(LumenplayServiceUuidString);
@@ -134,7 +124,7 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         mFirmwareUpdateService.setObserver(this);
 
         mFirmwareUpdateService.setShouldReconnectState(true);
-        mState = FirmwareManagerStateEnum.State_UserUnpluggedDeviceAwaitingReconnect;
+        mState = FirmwareManagerStateEnum.State_DiscoverFirmwareServiceCharacteristics;
 
         //TODO: Change this to be based on the available services and not the name
         if(mUpdateDevice.getName().equals("RigDfu")) {
@@ -155,53 +145,33 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
                 mFirmwareUpdateService.connectDevice();
             }
         } else {
-            return sendEnterBootloaderCommand();
+            return sendEnterBootloaderCommand(activateCharacteristic, activateCommand);
         }
 
         return true;
+    }
+    
+    private void initStateVariables() {
+    	mIsFileSizeWritten = false;
+    	mIsInitPacketSent = false;
+    	mIsPacketNotificationEnabled = false;
+    	mIsReceivingFirmwareImage = false;
+    	mIsLastPacket = false;
+    	mShouldStopSendingPackets = false;
+    	mDidForceEraseAfterStmUpdateImageRan = false;
+    	
+    	mObserver = null;
+    	mState = FirmwareManagerStateEnum.State_Init;
+    	mImageSize = 0;
+    	mImage = null;
     }
 
     public void setObserver(IRigFirmwareUpdateManagerObserver observer) {
         mObserver = observer;
     }
 
-    private boolean sendEnterBootloaderCommand() {
+    private boolean sendEnterBootloaderCommand(BluetoothGattCharacteristic characteristic, byte [] command) {
         RigLog.d("__RigFirmwareUpdateManager.sendEnterBootloaderCommand__");
-        BluetoothGattService deviceService = null;
-        BluetoothGattCharacteristic deviceControlPoint = null;
-
-        UUID lumenplayServiceUuid = UUID.fromString(LumenplayServiceUuidString);
-        UUID lumenplayControlPointUuid = UUID.fromString(LumenplayControlPointUuidString);
-
-        for(BluetoothGattService service : mUpdateDevice.getServiceList()) {
-            if(service.getUuid().equals(lumenplayServiceUuid)) {
-                deviceService = service;
-                break;
-            }
-        }
-
-        if(deviceService == null) {
-            RigLog.e("Did not find update service!");
-            if(mObserver != null) {
-                mObserver.updateStatus("Failed to start device bootloader!", -1);
-            }
-            return false;
-        }
-
-        for(BluetoothGattCharacteristic characteristic : deviceService.getCharacteristics()) {
-            if(characteristic.getUuid().equals(lumenplayControlPointUuid)) {
-                deviceControlPoint = characteristic;
-                break;
-            }
-        }
-
-        if(deviceControlPoint == null) {
-            RigLog.e("Did not find device control point!");
-            if(mObserver != null) {
-                mObserver.updateStatus("Failed to start device bootloader!", -2);
-            }
-            return false;
-        }
 
         RigLeDiscoveryManager dm = RigLeDiscoveryManager.getInstance();
         dm.stopDiscoveringDevices();
@@ -211,7 +181,8 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
             e.printStackTrace();
         }
 
-        RigDeviceRequest dr = new RigDeviceRequest(new String [] { RigDfuServiceUuidString }, 0);
+        String dfuServiceUuidString = mFirmwareUpdateService.getDfuServiceUuidString();
+        RigDeviceRequest dr = new RigDeviceRequest(new String [] { dfuServiceUuidString }, 0);
         dr.setObserver(this);
         dm.startDiscoverDevices(dr);
         if(mObserver != null) {
@@ -224,10 +195,30 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         RigLeConnectionManager.getInstance().setObserver(this);
 
         RigLog.d("Send enter bootloader command");
-        byte [] command = { (byte)255, 0, 0, 0, 0, 0, 0 };
-        mUpdateDevice.writeCharacteristic(deviceControlPoint, command);
+        mUpdateDevice.writeCharacteristic(characteristic, command);
 
         return true;
+    }
+    
+    private void cleanUpAfterFailure() {
+    	RigLeConnectionManager.getInstance().setObserver(mOldConnectionObserver);
+    	
+    	if(mUpdateDevice != null) {
+    		if(RigCoreBluetooth.getInstance().getDeviceConnectionState(mUpdateDevice.getBluetoothDevice()) ==
+                    BluetoothProfile.STATE_CONNECTED) {
+    			RigLeConnectionManager.getInstance().disconnectDevice(mUpdateDevice);
+    		}
+    	}
+    	
+    	initStateVariables();
+    }
+    
+    private int getImageSize() {
+    	int size = mImageSize;
+    	if(mFirmwareUpdateService.isSecureDfu()) {
+    		size -= (ImageStartPacketSize + ImageInitPacketSize);
+    	}
+    	return size;
     }
 
     private void resetFlags() {
@@ -239,20 +230,34 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         mTotalBytesSent = 0;
         mIsLastPacket = false;
     }
+    
+    private void updateDeviceAndTriggerDiscovery() {
+    	mFirmwareUpdateService.setShouldReconnectState(true);
+    	mFirmwareUpdateService.triggerServiceDiscovery();
+    }
 
     private void writeFileSize() {
         RigLog.d("__RigFirmwareUpdateManager.writeFileSize__");
 
-        byte [] data = new byte[4];
-        data[0] = (byte)(mImageSize & 0xFF);
-        data[1] = (byte)((mImageSize >> 8) & 0xFF);
-        data[2] = (byte)((mImageSize >> 16) & 0xFF);
-        data[3] = (byte)((mImageSize >> 24) & 0xFF);
+        if(mFirmwareUpdateService.isSecureDfu()) {
+        	byte [] data = new byte[ImageStartPacketSize];
+        	System.arraycopy(mImage, 0, data, 0, ImageStartPacketSize);
+        	
+        	mFirmwareUpdateService.writeDataToPacketCharacteristic(data);
+        	mObserver.updateStatus("Writing device update size", 0);
+        	
+        } else {
+	        byte [] data = new byte[4];
+	        data[0] = (byte)(mImageSize & 0xFF);
+	        data[1] = (byte)((mImageSize >> 8) & 0xFF);
+	        data[2] = (byte)((mImageSize >> 16) & 0xFF);
+	        data[3] = (byte)((mImageSize >> 24) & 0xFF);
+	
+	        RigLog.d("File size array: " + Arrays.toString(data));
 
-        RigLog.d("File size array: " + Arrays.toString(data));
-
-        mFirmwareUpdateService.writeDataToPacketCharacteristic(data);
-        mObserver.updateStatus("Writing device update size", 0);
+        	mFirmwareUpdateService.writeDataToPacketCharacteristic(data);
+        	mObserver.updateStatus("Writing device update size", 0);
+        }
     }
 
     private void enablePacketNotification() {
@@ -261,6 +266,24 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
 
         mFirmwareUpdateService.writeDataToControlPoint(data);
         mObserver.updateStatus("Enabling packet notifications", 0);
+    }
+    
+    private void sendInitPacket() {
+    	RigLog.d("__sendInitPacket__");
+    	byte [] initPacketOne = new byte[ImageInitPacketSize/2];
+    	byte [] initPacketTwo = new byte[ImageInitPacketSize/2];
+    	
+    	System.arraycopy(mImage, ImageInitPacketIndex, initPacketOne, 0, ImageInitPacketSize/2);
+    	System.arraycopy(mImage, ImageInitPacketIndex + (ImageInitPacketSize/2), initPacketTwo, 0, ImageInitPacketSize/2);
+    	
+    	mFirmwareUpdateService.writeDataToPacketCharacteristic(initPacketOne);
+    	
+    	try {
+    		Thread.sleep(100);
+    	} catch (Exception e) {
+    		
+    	}
+    	mFirmwareUpdateService.writeDataToPacketCharacteristic(initPacketTwo);
     }
 
     private void receiveFirmwareImage() {
@@ -272,15 +295,26 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
 
     private void startUploadingFile() {
         RigLog.d("__startUploadingFile__");
-        mTotalPackets = (mImageSize / BytesInOnePacket);
-        mLastPacketSize = BytesInOnePacket;
-        if((mImageSize % BytesInOnePacket) != 0) {
+        int size = getImageSize();
+        mTotalPackets = (size / BytesInOnePacket);
+        if((size % BytesInOnePacket) != 0) {
             mTotalPackets++;
-            mLastPacketSize = (mImageSize - ((mTotalPackets - 1) * BytesInOnePacket));
         }
+        
+        determineLastPacketSize();
 
         mObserver.updateStatus("Transferring New Device Software", 0);
         sendPacket();
+    }
+    
+    private void determineLastPacketSize() {
+    	int imageSizeLocal = getImageSize();
+    	if((imageSizeLocal % BytesInOnePacket) == 0) {
+    		mLastPacketSize = BytesInOnePacket;
+    	} else {
+    		mLastPacketSize = (imageSizeLocal - ((mTotalPackets - 1) * BytesInOnePacket));
+    	}
+    	RigLog.d("Last packet size: " + mLastPacketSize);
     }
 
     private void sendPacket() {
@@ -288,16 +322,29 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
 
         mPacketNumber++;
         byte [] packet;
+        int packetSize = BytesInOnePacket;
+        
         if(mPacketNumber == mTotalPackets) {
             RigLog.i("Sending last packet: " + mPacketNumber);
             mIsLastPacket = true;
-            packet = new byte[mLastPacketSize];
-            System.arraycopy(mImage, (mPacketNumber - 1) * BytesInOnePacket, packet, 0, mLastPacketSize);
+//            packet = new byte[mLastPacketSize];
+            packetSize = mLastPacketSize;
+//            System.arraycopy(mImage, (mPacketNumber - 1) * BytesInOnePacket, packet, 0, mLastPacketSize);
         } else {
             RigLog.i("Sending packet: " + mPacketNumber + "/" + mTotalPackets);
-            packet = new byte[BytesInOnePacket];
-            System.arraycopy(mImage, (mPacketNumber - 1) * BytesInOnePacket, packet, 0, BytesInOnePacket);
+//            packet = new byte[BytesInOnePacket];
+//            System.arraycopy(mImage, (mPacketNumber - 1) * BytesInOnePacket, packet, 0, BytesInOnePacket);
         }
+        
+        packet = new byte[packetSize];
+        int index;
+        if(mFirmwareUpdateService.isSecureDfu()) {
+        	index = ImageSecureDataStart + (mPacketNumber - 1) * BytesInOnePacket;
+        } else {
+        	index = (mPacketNumber - 1) * BytesInOnePacket;
+        }
+        
+        System.arraycopy(mImage, index, packet, 0, packetSize);
         mFirmwareUpdateService.writeDataToPacketCharacteristic(packet);
     }
 
@@ -320,33 +367,55 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
          * and then a reconnect will be attempted. */
         mFirmwareUpdateService.setShouldReconnectState(false);
         mFirmwareUpdateService.setShouldAlwaysReconnectState(false);
-        if(mState == FirmwareManagerStateEnum.State_FinishedRadioImageTransfer) {
-            mFirmwareUpdateService.completeUpdate();
-        }
+        mFirmwareUpdateService.completeUpdate();
+        
         mFirmwareUpdateService.writeDataToControlPoint(cmd);
         mObserver.updateStatus("Activating device software", 0);
     }
 
-    private void scheduleReconnect() {
-        RigLog.d("__RigFirmwareUpdateManager.scheduleReconnect__");
-        Handler mHandler = new Handler(Looper.getMainLooper());
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                    activateStmUpdateImageTimerFired();
-                }
-        }, 4000);
+//    private void scheduleReconnect() {
+//        RigLog.d("__RigFirmwareUpdateManager.scheduleReconnect__");
+//        Handler mHandler = new Handler(Looper.getMainLooper());
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                    activateStmUpdateImageTimerFired();
+//                }
+//        }, 4000);
+//    }
+    
+    @Override
+    public void didConnectPeripheral() {
+    	mFirmwareUpdateService.triggerServiceDiscovery();
+    }
+    
+	@Override
+    public void didDiscoverCharacteristicsForDFUService() {
+        RigLog.d("__RigFirmwareUpdateManager.didDiscoverCharacteristicsForDFUService__");
+
+        if(mState == FirmwareManagerStateEnum.State_TransferringRadioImage) {
+        	mState = FirmwareManagerStateEnum.State_Init;
+        	mIsFileSizeWritten = false;
+        	mIsInitPacketSent = false;
+        	mIsPacketNotificationEnabled = false;
+        	mIsReceivingFirmwareImage = false;
+        	mObserver.updateProgress(0);
+        	mPacketNumber = 0;
+        }
+        
+        mFirmwareUpdateService.enableControlPointNotifications();
     }
 
     @Override
     public void didEnableControlPointNotifications() {
         RigLog.d("__RigFirmwareUpdateManager.didEnableControlPointNotifications__");
 
-        byte [] cmd = { (byte)DfuOpCodeEnum.DfuOpCode_EraseSizeRequest.ordinal() };
+        byte [] cmd = { (byte)DfuOpCodeEnum.DfuOpCode_Start.ordinal() };
 
-        mShouldWaitForErasedSize = true;
+        mShouldWaitForErasedSize = false;
+        mState = FirmwareManagerStateEnum.State_TransferringRadioImage;
         mFirmwareUpdateService.writeDataToControlPoint(cmd);
-        mObserver.updateStatus("Starting Lumenplay device update", 0);
+        mObserver.updateStatus("Initializing Device Firmware Update", 0);
     }
 
     @Override
@@ -358,17 +427,18 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         }
 
         if(mState == FirmwareManagerStateEnum.State_FinishedRadioImageTransfer) {
+        	try {
+        		Thread.sleep(2000);
+        	} catch(Exception e) {
+        		
+        	}
             mObserver.didFinishUpdate();
-        }
-
-        if(mDidActivateFirmware && mState == FirmwareManagerStateEnum.State_ActivatingStmUpdaterImage) {
-            mDidActivateFirmware = false;
-            scheduleReconnect();
-            return;
         }
 
         if(!mIsFileSizeWritten) {
             writeFileSize();
+        } else if(!mIsInitPacketSent && mFirmwareUpdateService.isSecureDfu()) {
+        	sendInitPacket();
         } else if(!mIsPacketNotificationEnabled) {
             mIsPacketNotificationEnabled = true;
             receiveFirmwareImage();
@@ -379,65 +449,16 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
     }
 
     @Override
-    public void didConnectPeripheral() {
-
-    }
-
-    @Override
     public void didDisconnectPeripheral() {
         RigLog.d("__RigFirmwareUpdateManager.didDisconnectDevice__");
 
-        if(mState == FirmwareManagerStateEnum.State_TransferringStmUpdateImage) {
-            mState = FirmwareManagerStateEnum.State_DiscoverFirmwareServiceCharacteristics;
-            resetFlags();
-        } else if(mState == FirmwareManagerStateEnum.State_TransferringRadioImage) {
-            mState = FirmwareManagerStateEnum.State_ReconnectAfterStmUpdate;
-            resetFlags();
-        }
-    }
-
-    @SuppressWarnings({ "incomplete-switch"})
-	@Override
-    public void didDiscoverCharacteristicsForDFUService() {
-        RigLog.d("__RigFirmwareUpdateManager.didDiscoverCharacteristicsForDFUService__");
-
-        switch(mState) {
-            case State_UserUnpluggedDeviceAwaitingReconnect: //fall through
-            case State_DiscoverFirmwareServiceCharacteristics:
-                mState = FirmwareManagerStateEnum.State_CheckEraseAfterUnplug;
-                mFirmwareUpdateService.enableControlPointNotifications();
-                break;
-            case State_ReconnectAfterInitialFlashErase:
-                mState = FirmwareManagerStateEnum.State_TransferringStmUpdateImage;
-                mFirmwareUpdateService.enableControlPointNotifications();
-                break;
-            case State_ReconnectAfterStmUpdate:
-                mFirmwareUpdateService.enableControlPointNotifications();
-                break;
-            case State_ReconnectAfterStmUpdateFlashErase:
-                mState = FirmwareManagerStateEnum.State_TransferringRadioImage;
-                mFirmwareUpdateService.enableControlPointNotifications();
-                break;
-        }
-    }
-
-    private void activateStmUpdateImageTimerFired() {
-        RigLog.d("__RigFirmwareUpdateManager.activateStmUpdateImageTimerFired__");
-
-        mState = FirmwareManagerStateEnum.State_ReconnectAfterStmUpdate;
-        resetFlags();
-
-        mImage = null;
-        mImage = new byte[mRadioImageSize];
-        System.arraycopy(mRadioImage, 0, mImage, 0, mRadioImageSize);
-        mImageSize = mRadioImageSize;
-
-        mObserver.updateProgress(0);
-        //TODO: Kick off time to ask user to unplug and replug if update gets stuck for some reason
-        mObserver.updateStatus("Reconnecting... Please wait...", 0);
-
-        mFirmwareUpdateService.setShouldAlwaysReconnectState(true);
-        mFirmwareUpdateService.connectDevice();
+//        if(mState == FirmwareManagerStateEnum.State_TransferringStmUpdateImage) {
+//            mState = FirmwareManagerStateEnum.State_DiscoverFirmwareServiceCharacteristics;
+//            resetFlags();
+//        } else if(mState == FirmwareManagerStateEnum.State_TransferringRadioImage) {
+//            mState = FirmwareManagerStateEnum.State_ReconnectAfterStmUpdate;
+//            resetFlags();
+//        }
     }
 
     @Override
@@ -451,8 +472,19 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
             if(value[2] == OperationSuccess) {
                 RigLog.i("Received notification for DFU_START");
                 mIsFileSizeWritten = true;
-                enablePacketNotification();
+                if(mFirmwareUpdateService.isSecureDfu()) {
+                	RigLog.d("Start Init packet sequence");
+                	byte [] cmd = { (byte)DfuOpCodeEnum.DfuOpCode_Init.ordinal() };
+                	mFirmwareUpdateService.writeDataToControlPoint(cmd);
+                } else {
+                	enablePacketNotification();
+                }
             }
+        } else if(opCode == ReceivedOpcode && request == (byte)DfuOpCodeEnum.DfuOpCode_Init.ordinal()) {
+        	if(value[2] == OperationSuccess) {
+        		mIsInitPacketSent = true;
+        		enablePacketNotification();
+        	}
         } else if(opCode == PacketReceivedNotification) {
             mTotalBytesSent = ((value[1] & 0xFF) + ((value[2] & 0xFF) << 8) + ((value[3] & 0xFF) << 16) + ((value[4] & 0xFF) << 24));
 
@@ -483,9 +515,7 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         } else if(opCode == ReceivedOpcode && request == (byte)DfuOpCodeEnum.DfuOpCode_ValidateFirmwareImage.ordinal()) {
             if(value[2] == OperationSuccess) {
                 RigLog.i("Successful transfer and validation of firmware image!");
-                if(mState == FirmwareManagerStateEnum.State_TransferringStmUpdateImage) {
-                    mState = FirmwareManagerStateEnum.State_ActivatingStmUpdaterImage;
-                } else if(mState == FirmwareManagerStateEnum.State_TransferringRadioImage) {
+                if(mState == FirmwareManagerStateEnum.State_TransferringRadioImage) {
                     mObserver.updateStatus("Device software validated successfully!", 0);
                     mState = FirmwareManagerStateEnum.State_FinishedRadioImageTransfer;
                 }
@@ -497,6 +527,11 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
             }
         } else if(opCode == ReceivedOpcode && request == (byte)DfuOpCodeEnum.DfuOpCode_EraseSizeRequest.ordinal()) {
             if(value[2] == OperationSuccess) {
+            	/* Note: This is not longer used for the dual bank bootloader.  The entire bank does not need to be
+            	 * erased to perform a firmware update.  In additional, as of S110 7.0, it is no longer necessary to
+            	 * disable the radio when reading/write to the internal flash of the nRF.  This code is left for reference
+            	 * and backwards compatibility with old bootloaders.
+            	 */
                 mTotalBytesErased = (value[3] + (value[4] << 8) + (value[5] << 16) + (value[6] << 24)) & 0xFFFFFFFF;
                 RigLog.i("TotalBytesErased: " + mTotalBytesErased);
                 if(mTotalBytesErased < mImageSize) {
@@ -523,7 +558,7 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
     /* IRigLeDiscoveryManagerObserver methods */
     @Override
     public void didDiscoverDevice(RigAvailableDeviceData device) {
-        RigLog.d("__RigFirmwareUpdateManager.didDiscoveryDevice__");
+        RigLog.d("__RigFirmwareUpdateManager.didDiscoverDevice__");
         RigLog.d("Found dfu device!");
         RigLeDiscoveryManager.getInstance().stopDiscoveringDevices();
         RigLeConnectionManager.getInstance().setObserver(this);
@@ -553,7 +588,7 @@ public class RigFirmwareUpdateManager implements IRigLeDiscoveryManagerObserver,
         RigLog.d("Connected!");
         mUpdateDevice = device;
 
-        RigLeConnectionManager.getInstance().setObserver(mFirmwareUpdateService);
+        RigLeConnectionManager.getInstance().setObserver(mOldConnectionObserver);
         mFirmwareUpdateService.setShouldReconnectState(true);
         mFirmwareUpdateService.setDevice(device);
         mFirmwareUpdateService.triggerServiceDiscovery();
