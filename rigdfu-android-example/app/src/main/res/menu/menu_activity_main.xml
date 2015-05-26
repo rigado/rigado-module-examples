@@ -1,0 +1,10 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ActivityMain">
+
+    <item android:id="@+id/id_menu_search"
+        android:title="@string/txt_menu_find"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,12 @@
+[
+    {
+        "fwname": "bmdware_eval",
+        "properties": {
+            "version": 2.0,
+            "build": 0,
+            "filename1": "bmdware_eval_2_0_0_ota_blue",
+            "filename2": "",
+            "comment": "in the fw filename above, the .bin extension is not necessary. note: filename1=radio, filename2=controller. Either can be omitted"
+        }
+    }
+]
