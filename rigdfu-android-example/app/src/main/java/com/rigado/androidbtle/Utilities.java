@@ -63,32 +63,21 @@ public class Utilities {
 
         if (firmwareRecord != null){
 
-            final String filename1 = firmwareRecord.getProperties().getFilename1();
-            //final String filename2 = firmwareRecord.getProperties().getFilename2();
+            final String filename = firmwareRecord.getProperties().getFilename1();
 
             // ensure that the filenames contain no extension
             String strFilenameNoExt1;
-            if (filename1.contains(".")) {
-                strFilenameNoExt1 = filename1.substring(0, filename1.lastIndexOf('.'));
+            if (filename.contains(".")) {
+                strFilenameNoExt1 = filename.substring(0, filename.lastIndexOf('.'));
             } else {
-                strFilenameNoExt1 = filename1;
+                strFilenameNoExt1 = filename;
             }
 
-//            String strFilenameNoExt2;
-//            if (filename1.contains(".")) {
-//                strFilenameNoExt2 = filename2.substring(0, filename2.lastIndexOf('.'));
-//            } else {
-//                strFilenameNoExt2 = filename2;
-//            }
-
             final int deviceFWid = context.getResources().getIdentifier(strFilenameNoExt1, "raw", context.getPackageName());
-            //final int deviceControllerFWid = context.getResources().getIdentifier(strFilenameNoExt2, "raw", context.getPackageName());
 
             InputStream fwImageInputStream = (deviceFWid != 0) ? context.getResources().openRawResource(deviceFWid) : null;
-            //InputStream fwControllerImageInputStream = (deviceControllerFWid != 0) ? context.getResources().openRawResource(deviceControllerFWid) : null;
 
-            //TODO this needs fixing
-            fwManager.updateFirmware(device, fwImageInputStream, bootCharacteristic, bootCommand);//radio or controller images could be null
+            fwManager.updateFirmware(device, fwImageInputStream, bootCharacteristic, bootCommand);
         } else {
             Log.e(TAG, "Firmware filenames are unknown - were the JSON values read correctly?");
         }

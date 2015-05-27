@@ -45,11 +45,16 @@ public class ActivityMain extends ActionBarActivity
     private final static int BTLE_SEARCH_TIMEOUT_MS = 20000;//20sec
     private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10sec
     private final static String BTLE_DEFAULT_DEVICE_NAME = "RigDfu";
+
+    /*TODO: This threshold can be raised to force devices to be within close proximity of the Android
+    device performing the update */
     private final static int RSSI_UPDATE_THRESHOLD = -128;
 
+    //TODO: Update the following strings to match the UUIDs of your custom service
     private final static String RESET_SERVICE_UUID_STRING = "2413B33F-707F-90BD-2045-2AB8807571B7";
     private final static String RESET_CHARACTERISTIC_UUID_STRING = "2413B43F-707F-90BD-2045-2AB8807571B7";
 
+    //TODO: Update this command to match the reset command for your device
     private final static byte [] bootloader_command = { 0x03, 0x56, 0x30, 0x57 };
 
     // members
@@ -91,6 +96,11 @@ public class ActivityMain extends ActionBarActivity
         mButtonDeploy.setOnClickListener(this);
 
         // read list of available firmwares - these are listed in res/raw/firmware_descriptions.json
+        /* TODO: Update raw folder to contain your binary and update firmware_descriptions.json to have
+           the necessary information regarding the update binary.  Note: Update binaries must be
+           binary files generated using the genimage.py Python script.  See Getting Started with the
+           Rigado Secure Bootlaoder for more details.
+         */
         mJsonFirmwareReader = new JsonFirmwareReader();
         mJsonFirmwareTypeList = mJsonFirmwareReader.getFirmwareList(this);
 
