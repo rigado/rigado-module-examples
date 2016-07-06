@@ -264,14 +264,16 @@ public class ActivityMain extends ActionBarActivity
         showStatus(R.string.txt_tv_status_idle);
     }
 
-
     @Override
+    public void updateFailed(int error) {
+        Log.d(TAG, "Update Failed");
+    }
+
     public void displayUnplugMessage() {
 
     }
 
 
-    @Override
     public void dismissUnplugAlert() {
 
     }

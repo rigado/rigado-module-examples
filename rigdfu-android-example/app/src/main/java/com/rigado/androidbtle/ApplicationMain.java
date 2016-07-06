@@ -15,8 +15,7 @@ public class ApplicationMain extends Application{
         super.onCreate();
 
         // Required initialization
-        RigCoreBluetooth.getInstance().setContext(this);
-        RigCoreBluetooth.getInstance().init(getPackageName());
+        RigCoreBluetooth.initialize(this);
     }
 
     @Override
