@@ -83,11 +83,11 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     [RigLeConnectionManager sharedInstance].delegate = self;
     
     /* TODO: Firmware list will be displayed to the user.  Provide a useful string for the name of the binary. */
-    firmwareList = [NSArray arrayWithObjects:@"BMDware Eval", nil];
+    firmwareList = @[@"eval_demo_1_0_0_ota", @"bmd200_blinky_demo_ota"];
     /* TODO: Create an array listing that matches the name of the firmware image added to the project.  The file must be of type .bin
      * Note: DO NOT add the file extention (e.g. bin) as it will be handled later
      */
-    firmwareBinaryList = [NSArray arrayWithObjects:@"bmd-ware-no-key", nil];
+    firmwareBinaryList = @[@"eval_demo_1_0_0_ota", @"bmd200_blinky_demo_ota"];
     
     CAGradientLayer *bgLayer = [self blueGradient];
     bgLayer.frame = self.view.bounds;

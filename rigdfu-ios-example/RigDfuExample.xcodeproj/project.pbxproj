@@ -19,6 +19,8 @@
 		203220481907196600DAA3FB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203220271907196500DAA3FB /* Foundation.framework */; };
 		203220491907196600DAA3FB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2032202B1907196500DAA3FB /* UIKit.framework */; };
 		2032206119071AE300DAA3FB /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2032206019071AE300DAA3FB /* CoreBluetooth.framework */; };
+		4C9808331D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */; };
+		4C9808341D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */; };
 		5E2D867A19DA53E600720362 /* DeploymentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D867919DA53E600720362 /* DeploymentViewController.m */; };
 		5E8443771A5EFEA00085BD36 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E8443721A5EFEA00085BD36 /* SVIndefiniteAnimatedView.m */; };
 		5E8443781A5EFEA00085BD36 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5E8443741A5EFEA00085BD36 /* SVProgressHUD.bundle */; };
@@ -66,6 +68,8 @@
 		203220461907196500DAA3FB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		2032206019071AE300DAA3FB /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		2032206219071AEA00DAA3FB /* libRigablue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libRigablue.a; sourceTree = "<group>"; };
+		4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = bmd200_blinky_demo_ota.bin; sourceTree = "<group>"; };
+		4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = eval_demo_1_0_0_ota.bin; sourceTree = "<group>"; };
 		5E2D867819DA53E600720362 /* DeploymentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeploymentViewController.h; sourceTree = "<group>"; };
 		5E2D867919DA53E600720362 /* DeploymentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeploymentViewController.m; sourceTree = "<group>"; };
 		5E8443711A5EFEA00085BD36 /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
@@ -166,6 +170,8 @@
 		5E2E886619D20D0E0030600A /* Firmware */ = {
 			isa = PBXGroup;
 			children = (
+				4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */,
+				4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */,
 			);
 			name = Firmware;
 			sourceTree = "<group>";
@@ -296,7 +302,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E8443781A5EFEA00085BD36 /* SVProgressHUD.bundle in Resources */,
+				4C9808331D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin in Resources */,
 				203220401907196500DAA3FB /* Images.xcassets in Resources */,
+				4C9808341D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin in Resources */,
 				203220321907196500DAA3FB /* InfoPlist.strings in Resources */,
 				2032203B1907196500DAA3FB /* Main.storyboard in Resources */,
 			);
