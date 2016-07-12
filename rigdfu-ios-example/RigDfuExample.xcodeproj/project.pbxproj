@@ -247,7 +247,7 @@
 				ORGANIZATIONNAME = "Rigado, LLC";
 				TargetAttributes = {
 					203220231907196500DAA3FB = {
-						DevelopmentTeam = G4HW4JEJP2;
+						DevelopmentTeam = 5PJX36PFW7;
 					};
 					203220441907196500DAA3FB = {
 						TestTargetID = 203220231907196500DAA3FB;

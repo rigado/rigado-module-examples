@@ -157,10 +157,12 @@ NSString *kDisModelNumberUuidString = @"2a24";
         updateDFUServiceUuid = [CBUUID UUIDWithString:kupdateDFUServiceUuidString300];
         updateDFUControlPointUuid = [CBUUID UUIDWithString:kupdateDFUControlPointUuidString300];
         updateDFUPacketCharUuid = [CBUUID UUIDWithString:kupdateDFUPacketCharUuidString300];
+        updateDFUServiceUuidString = kupdateDFUServiceUuidString300;
     } else if ([updateDevice getServiceWithUuid:[CBUUID UUIDWithString:kupdateDFUServiceUuidString200]]) {
         updateDFUServiceUuid = [CBUUID UUIDWithString:kupdateDFUServiceUuidString200];
         updateDFUControlPointUuid = [CBUUID UUIDWithString:kupdateDFUControlPointUuidString200];
         updateDFUPacketCharUuid = [CBUUID UUIDWithString:kupdateDFUPacketCharUuidString200];
+        updateDFUServiceUuidString = kupdateDFUServiceUuidString200;
     }
     for (CBService *service in [updateDevice getSerivceList]) {
         if ([[service UUID] isEqual:updateDFUServiceUuid]) {
