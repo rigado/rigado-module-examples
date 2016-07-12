@@ -1,0 +1,492 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		202A6E061900EB2E0063D759 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E051900EB2E0063D759 /* Foundation.framework */; };
+		202A6E141900EB2E0063D759 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E131900EB2E0063D759 /* XCTest.framework */; };
+		202A6E151900EB2E0063D759 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E051900EB2E0063D759 /* Foundation.framework */; };
+		202A6E171900EB2E0063D759 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E161900EB2E0063D759 /* UIKit.framework */; };
+		202A6E1A1900EB2E0063D759 /* libRigablue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E021900EB2E0063D759 /* libRigablue.a */; };
+		202A6E2C1900EB440063D759 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202A6E2B1900EB440063D759 /* CoreBluetooth.framework */; };
+		202A6E321900F1C40063D759 /* RigLeDiscoveryManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 202A6E311900F1C40063D759 /* RigLeDiscoveryManager.m */; };
+		202A6E351900F2CB0063D759 /* RigDeviceRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 202A6E341900F2CB0063D759 /* RigDeviceRequest.m */; };
+		2032205C1907198F00DAA3FB /* RigAvailableDeviceData.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 20E3824319019765006BF49D /* RigAvailableDeviceData.h */; };
+		2032205D1907198F00DAA3FB /* RigDeviceRequest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 202A6E331900F2CB0063D759 /* RigDeviceRequest.h */; };
+		2032205E1907198F00DAA3FB /* RigLeDiscoveryManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 202A6E301900F1C40063D759 /* RigLeDiscoveryManager.h */; };
+		2032205F1907198F00DAA3FB /* RigLeConnectionManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 20E382461901A416006BF49D /* RigLeConnectionManager.h */; };
+		203220B2190EFC5800DAA3FB /* RigLeBaseDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 203220B1190EFC5800DAA3FB /* RigLeBaseDevice.m */; };
+		203C49DB1910685F00A457B0 /* RigLeBaseDevice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 203220B0190EFC5800DAA3FB /* RigLeBaseDevice.h */; };
+		20E3824519019765006BF49D /* RigAvailableDeviceData.m in Sources */ = {isa = PBXBuildFile; fileRef = 20E3824419019765006BF49D /* RigAvailableDeviceData.m */; };
+		20E382481901A416006BF49D /* RigLeConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 20E382471901A416006BF49D /* RigLeConnectionManager.m */; };
+		20E3824B1901A5D6006BF49D /* RigCoreBluetoothInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 20E3824A1901A5D6006BF49D /* RigCoreBluetoothInterface.m */; };
+		5E2D19421BAB63DD00B38EDE /* RigFirmwareUpdateRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D19411BAB63DD00B38EDE /* RigFirmwareUpdateRequest.m */; };
+		5E2D19431BAB6BD000B38EDE /* RigFirmwareUpdateRequest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5E2D19401BAB63DD00B38EDE /* RigFirmwareUpdateRequest.h */; };
+		5E7CFFB3196F055400FF6C95 /* RigFirmwareUpdateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7CFFAF196F055400FF6C95 /* RigFirmwareUpdateService.m */; };
+		5E7CFFB4196F055400FF6C95 /* RigFirmwareUpdateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7CFFB1196F055400FF6C95 /* RigFirmwareUpdateManager.m */; };
+		5E8443851A5F05080085BD36 /* Rigablue.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5E8443841A5F03C20085BD36 /* Rigablue.h */; };
+		5EAE38FF19FFF8E90044340E /* RigFirmwareUpdateManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5E7CFFB2196F055400FF6C95 /* RigFirmwareUpdateManager.h */; };
+		5EAE390019FFF8E90044340E /* RigDfuError.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5E25736A196F0D1F007701D7 /* RigDfuError.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		202A6E181900EB2E0063D759 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 202A6DFA1900EB2E0063D759 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 202A6E011900EB2E0063D759;
+			remoteInfo = Rigablue;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		202A6E001900EB2E0063D759 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				5E2D19431BAB6BD000B38EDE /* RigFirmwareUpdateRequest.h in CopyFiles */,
+				5E8443851A5F05080085BD36 /* Rigablue.h in CopyFiles */,
+				5EAE38FF19FFF8E90044340E /* RigFirmwareUpdateManager.h in CopyFiles */,
+				5EAE390019FFF8E90044340E /* RigDfuError.h in CopyFiles */,
+				203C49DB1910685F00A457B0 /* RigLeBaseDevice.h in CopyFiles */,
+				2032205C1907198F00DAA3FB /* RigAvailableDeviceData.h in CopyFiles */,
+				2032205D1907198F00DAA3FB /* RigDeviceRequest.h in CopyFiles */,
+				2032205E1907198F00DAA3FB /* RigLeDiscoveryManager.h in CopyFiles */,
+				2032205F1907198F00DAA3FB /* RigLeConnectionManager.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		202A6E021900EB2E0063D759 /* libRigablue.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRigablue.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		202A6E051900EB2E0063D759 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		202A6E091900EB2E0063D759 /* Rigablue-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Rigablue-Prefix.pch"; sourceTree = "<group>"; };
+		202A6E121900EB2E0063D759 /* RigablueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RigablueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		202A6E131900EB2E0063D759 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		202A6E161900EB2E0063D759 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		202A6E2B1900EB440063D759 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		202A6E301900F1C40063D759 /* RigLeDiscoveryManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigLeDiscoveryManager.h; sourceTree = "<group>"; };
+		202A6E311900F1C40063D759 /* RigLeDiscoveryManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigLeDiscoveryManager.m; sourceTree = "<group>"; };
+		202A6E331900F2CB0063D759 /* RigDeviceRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigDeviceRequest.h; sourceTree = "<group>"; };
+		202A6E341900F2CB0063D759 /* RigDeviceRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigDeviceRequest.m; sourceTree = "<group>"; };
+		203220B0190EFC5800DAA3FB /* RigLeBaseDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigLeBaseDevice.h; sourceTree = "<group>"; };
+		203220B1190EFC5800DAA3FB /* RigLeBaseDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigLeBaseDevice.m; sourceTree = "<group>"; };
+		20E3824319019765006BF49D /* RigAvailableDeviceData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigAvailableDeviceData.h; sourceTree = "<group>"; };
+		20E3824419019765006BF49D /* RigAvailableDeviceData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigAvailableDeviceData.m; sourceTree = "<group>"; };
+		20E382461901A416006BF49D /* RigLeConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigLeConnectionManager.h; sourceTree = "<group>"; };
+		20E382471901A416006BF49D /* RigLeConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigLeConnectionManager.m; sourceTree = "<group>"; };
+		20E382491901A5D6006BF49D /* RigCoreBluetoothInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigCoreBluetoothInterface.h; sourceTree = "<group>"; };
+		20E3824A1901A5D6006BF49D /* RigCoreBluetoothInterface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RigCoreBluetoothInterface.m; sourceTree = "<group>"; };
+		20E3824C1901A6F7006BF49D /* RigCoreBluetoothDiscoveryObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RigCoreBluetoothDiscoveryObserver.h; sourceTree = "<group>"; };
+		20E3824D1901A7BC006BF49D /* RigCoreBluetoothConnectionObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RigCoreBluetoothConnectionObserver.h; sourceTree = "<group>"; };
+		5E25736A196F0D1F007701D7 /* RigDfuError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RigDfuError.h; path = Rigablue/RigDfuError.h; sourceTree = "<group>"; };
+		5E2D19401BAB63DD00B38EDE /* RigFirmwareUpdateRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RigFirmwareUpdateRequest.h; path = Rigablue/RigFirmwareUpdateRequest.h; sourceTree = "<group>"; };
+		5E2D19411BAB63DD00B38EDE /* RigFirmwareUpdateRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RigFirmwareUpdateRequest.m; path = Rigablue/RigFirmwareUpdateRequest.m; sourceTree = "<group>"; };
+		5E7CFFAF196F055400FF6C95 /* RigFirmwareUpdateService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RigFirmwareUpdateService.m; path = Rigablue/RigFirmwareUpdateService.m; sourceTree = "<group>"; };
+		5E7CFFB0196F055400FF6C95 /* RigFirmwareUpdateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RigFirmwareUpdateService.h; path = Rigablue/RigFirmwareUpdateService.h; sourceTree = "<group>"; };
+		5E7CFFB1196F055400FF6C95 /* RigFirmwareUpdateManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RigFirmwareUpdateManager.m; path = Rigablue/RigFirmwareUpdateManager.m; sourceTree = "<group>"; };
+		5E7CFFB2196F055400FF6C95 /* RigFirmwareUpdateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RigFirmwareUpdateManager.h; path = Rigablue/RigFirmwareUpdateManager.h; sourceTree = "<group>"; };
+		5E8443841A5F03C20085BD36 /* Rigablue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rigablue.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		202A6DFF1900EB2E0063D759 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				202A6E2C1900EB440063D759 /* CoreBluetooth.framework in Frameworks */,
+				202A6E061900EB2E0063D759 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		202A6E0F1900EB2E0063D759 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				202A6E141900EB2E0063D759 /* XCTest.framework in Frameworks */,
+				202A6E171900EB2E0063D759 /* UIKit.framework in Frameworks */,
+				202A6E1A1900EB2E0063D759 /* libRigablue.a in Frameworks */,
+				202A6E151900EB2E0063D759 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		202A6DF91900EB2E0063D759 = {
+			isa = PBXGroup;
+			children = (
+				5E7CFFAE196F049700FF6C95 /* DeviceFirmwareUpdate */,
+				202A6E071900EB2E0063D759 /* Rigablue */,
+				202A6E041900EB2E0063D759 /* Frameworks */,
+				202A6E031900EB2E0063D759 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		202A6E031900EB2E0063D759 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				202A6E021900EB2E0063D759 /* libRigablue.a */,
+				202A6E121900EB2E0063D759 /* RigablueTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		202A6E041900EB2E0063D759 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				202A6E2B1900EB440063D759 /* CoreBluetooth.framework */,
+				202A6E051900EB2E0063D759 /* Foundation.framework */,
+				202A6E131900EB2E0063D759 /* XCTest.framework */,
+				202A6E161900EB2E0063D759 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		202A6E071900EB2E0063D759 /* Rigablue */ = {
+			isa = PBXGroup;
+			children = (
+				5E8443841A5F03C20085BD36 /* Rigablue.h */,
+				20E3824319019765006BF49D /* RigAvailableDeviceData.h */,
+				20E3824419019765006BF49D /* RigAvailableDeviceData.m */,
+				202A6E331900F2CB0063D759 /* RigDeviceRequest.h */,
+				202A6E341900F2CB0063D759 /* RigDeviceRequest.m */,
+				203220B0190EFC5800DAA3FB /* RigLeBaseDevice.h */,
+				203220B1190EFC5800DAA3FB /* RigLeBaseDevice.m */,
+				202A6E301900F1C40063D759 /* RigLeDiscoveryManager.h */,
+				202A6E311900F1C40063D759 /* RigLeDiscoveryManager.m */,
+				20E382461901A416006BF49D /* RigLeConnectionManager.h */,
+				20E382471901A416006BF49D /* RigLeConnectionManager.m */,
+				20E382491901A5D6006BF49D /* RigCoreBluetoothInterface.h */,
+				20E3824A1901A5D6006BF49D /* RigCoreBluetoothInterface.m */,
+				20E3824C1901A6F7006BF49D /* RigCoreBluetoothDiscoveryObserver.h */,
+				20E3824D1901A7BC006BF49D /* RigCoreBluetoothConnectionObserver.h */,
+				202A6E081900EB2E0063D759 /* Supporting Files */,
+			);
+			path = Rigablue;
+			sourceTree = "<group>";
+		};
+		202A6E081900EB2E0063D759 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				202A6E091900EB2E0063D759 /* Rigablue-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5E7CFFAE196F049700FF6C95 /* DeviceFirmwareUpdate */ = {
+			isa = PBXGroup;
+			children = (
+				5E7CFFAF196F055400FF6C95 /* RigFirmwareUpdateService.m */,
+				5E7CFFB0196F055400FF6C95 /* RigFirmwareUpdateService.h */,
+				5E7CFFB1196F055400FF6C95 /* RigFirmwareUpdateManager.m */,
+				5E7CFFB2196F055400FF6C95 /* RigFirmwareUpdateManager.h */,
+				5E25736A196F0D1F007701D7 /* RigDfuError.h */,
+				5E2D19401BAB63DD00B38EDE /* RigFirmwareUpdateRequest.h */,
+				5E2D19411BAB63DD00B38EDE /* RigFirmwareUpdateRequest.m */,
+			);
+			name = DeviceFirmwareUpdate;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		202A6E011900EB2E0063D759 /* Rigablue */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 202A6E251900EB2E0063D759 /* Build configuration list for PBXNativeTarget "Rigablue" */;
+			buildPhases = (
+				202A6DFE1900EB2E0063D759 /* Sources */,
+				202A6DFF1900EB2E0063D759 /* Frameworks */,
+				20F5F5CC19116D370024B1CC /* Run Script */,
+				202A6E001900EB2E0063D759 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Rigablue;
+			productName = Rigablue;
+			productReference = 202A6E021900EB2E0063D759 /* libRigablue.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		202A6E111900EB2E0063D759 /* RigablueTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 202A6E281900EB2E0063D759 /* Build configuration list for PBXNativeTarget "RigablueTests" */;
+			buildPhases = (
+				202A6E0E1900EB2E0063D759 /* Sources */,
+				202A6E0F1900EB2E0063D759 /* Frameworks */,
+				202A6E101900EB2E0063D759 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				202A6E191900EB2E0063D759 /* PBXTargetDependency */,
+			);
+			name = RigablueTests;
+			productName = RigablueTests;
+			productReference = 202A6E121900EB2E0063D759 /* RigablueTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		202A6DFA1900EB2E0063D759 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Rigado, LLC";
+			};
+			buildConfigurationList = 202A6DFD1900EB2E0063D759 /* Build configuration list for PBXProject "Rigablue" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 202A6DF91900EB2E0063D759;
+			productRefGroup = 202A6E031900EB2E0063D759 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				202A6E011900EB2E0063D759 /* Rigablue */,
+				202A6E111900EB2E0063D759 /* RigablueTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		202A6E101900EB2E0063D759 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		20F5F5CC19116D370024B1CC /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#if [ ${CONFIGURATION} == \"Release\" ]; then\n#APPLEDOC_PATH=`which appledoc`\n#if [ $APPLEDOC_PATH ]; then\n#$APPLEDOC_PATH \\\n#--project-name ${PRODUCT_NAME} \\\n#--project-company \"Rigado, LLC\" \\\n#--company-id \"com.rigado\" \\\n#--output doc \\\n#--keep-undocumented-objects \\\n#--keep-undocumented-members \\\n#--keep-intermediate-files \\\n#--no-repeat-first-par \\\n#--no-warn-invalid-crossref \\\n#--exit-threshold 2 \\\n#${PROJECT_DIR}/${PRODUCT_NAME}\n#fi;\n#fi;";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		202A6DFE1900EB2E0063D759 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				203220B2190EFC5800DAA3FB /* RigLeBaseDevice.m in Sources */,
+				202A6E321900F1C40063D759 /* RigLeDiscoveryManager.m in Sources */,
+				5E7CFFB4196F055400FF6C95 /* RigFirmwareUpdateManager.m in Sources */,
+				20E3824519019765006BF49D /* RigAvailableDeviceData.m in Sources */,
+				5E7CFFB3196F055400FF6C95 /* RigFirmwareUpdateService.m in Sources */,
+				20E3824B1901A5D6006BF49D /* RigCoreBluetoothInterface.m in Sources */,
+				5E2D19421BAB63DD00B38EDE /* RigFirmwareUpdateRequest.m in Sources */,
+				20E382481901A416006BF49D /* RigLeConnectionManager.m in Sources */,
+				202A6E351900F2CB0063D759 /* RigDeviceRequest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		202A6E0E1900EB2E0063D759 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		202A6E191900EB2E0063D759 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 202A6E011900EB2E0063D759 /* Rigablue */;
+			targetProxy = 202A6E181900EB2E0063D759 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		202A6E231900EB2E0063D759 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		202A6E241900EB2E0063D759 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		202A6E261900EB2E0063D759 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.1.0;
+				DSTROOT = /tmp/Rigablue.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Rigablue/Rigablue-Prefix.pch";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		202A6E271900EB2E0063D759 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.1.0;
+				DSTROOT = /tmp/Rigablue.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Rigablue/Rigablue-Prefix.pch";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		202A6E291900EB2E0063D759 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Rigablue/Rigablue-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "RigablueTests/RigablueTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		202A6E2A1900EB2E0063D759 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Rigablue/Rigablue-Prefix.pch";
+				INFOPLIST_FILE = "RigablueTests/RigablueTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		202A6DFD1900EB2E0063D759 /* Build configuration list for PBXProject "Rigablue" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				202A6E231900EB2E0063D759 /* Debug */,
+				202A6E241900EB2E0063D759 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		202A6E251900EB2E0063D759 /* Build configuration list for PBXNativeTarget "Rigablue" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				202A6E261900EB2E0063D759 /* Debug */,
+				202A6E271900EB2E0063D759 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		202A6E281900EB2E0063D759 /* Build configuration list for PBXNativeTarget "RigablueTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				202A6E291900EB2E0063D759 /* Debug */,
+				202A6E2A1900EB2E0063D759 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 202A6DFA1900EB2E0063D759 /* Project object */;
+}

@@ -19,14 +19,13 @@
 		203220481907196600DAA3FB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203220271907196500DAA3FB /* Foundation.framework */; };
 		203220491907196600DAA3FB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2032202B1907196500DAA3FB /* UIKit.framework */; };
 		2032206119071AE300DAA3FB /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2032206019071AE300DAA3FB /* CoreBluetooth.framework */; };
-		5E17C7AA1A54C37B00FAF1B2 /* bmd-ware-eval.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5E17C7A91A54C37B00FAF1B2 /* bmd-ware-eval.bin */; };
+		4C9808331D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */; };
+		4C9808341D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */; };
+		4C9808401D345F660082FE48 /* libRigablue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C98083D1D345F300082FE48 /* libRigablue.a */; };
 		5E2D867A19DA53E600720362 /* DeploymentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2D867919DA53E600720362 /* DeploymentViewController.m */; };
 		5E8443771A5EFEA00085BD36 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E8443721A5EFEA00085BD36 /* SVIndefiniteAnimatedView.m */; };
 		5E8443781A5EFEA00085BD36 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5E8443741A5EFEA00085BD36 /* SVProgressHUD.bundle */; };
 		5E8443791A5EFEA00085BD36 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E8443761A5EFEA00085BD36 /* SVProgressHUD.m */; };
-		5E8443831A5EFF5F0085BD36 /* libRigablue.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E8443801A5EFEAD0085BD36 /* libRigablue.a */; };
-		5E8695381A5DEB4D00D75EFF /* bmd-ware-secure.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5E8695371A5DEB4D00D75EFF /* bmd-ware-secure.bin */; };
-		5E86953A1A5DF75600D75EFF /* bmd-ware-no-key.bin in Resources */ = {isa = PBXBuildFile; fileRef = 5E8695391A5DF75600D75EFF /* bmd-ware-no-key.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,16 +36,16 @@
 			remoteGlobalIDString = 203220231907196500DAA3FB;
 			remoteInfo = RigablueTest;
 		};
-		5E84437F1A5EFEAD0085BD36 /* PBXContainerItemProxy */ = {
+		4C98083C1D345F300082FE48 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 5E84437A1A5EFEAD0085BD36 /* Rigablue.xcodeproj */;
+			containerPortal = 4C9808361D345F300082FE48 /* Rigablue.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 202A6E021900EB2E0063D759;
 			remoteInfo = Rigablue;
 		};
-		5E8443811A5EFEAD0085BD36 /* PBXContainerItemProxy */ = {
+		4C98083E1D345F300082FE48 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 5E84437A1A5EFEAD0085BD36 /* Rigablue.xcodeproj */;
+			containerPortal = 4C9808361D345F300082FE48 /* Rigablue.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 202A6E121900EB2E0063D759;
 			remoteInfo = RigablueTests;
@@ -69,7 +68,9 @@
 		203220461907196500DAA3FB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		2032206019071AE300DAA3FB /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		2032206219071AEA00DAA3FB /* libRigablue.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libRigablue.a; sourceTree = "<group>"; };
-		5E17C7A91A54C37B00FAF1B2 /* bmd-ware-eval.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "bmd-ware-eval.bin"; path = "RigablueTest/Firmware/bmd-ware-eval.bin"; sourceTree = "<group>"; };
+		4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = bmd200_blinky_demo_ota.bin; sourceTree = "<group>"; };
+		4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = eval_demo_1_0_0_ota.bin; sourceTree = "<group>"; };
+		4C9808361D345F300082FE48 /* Rigablue.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Rigablue.xcodeproj; sourceTree = "<group>"; };
 		5E2D867819DA53E600720362 /* DeploymentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeploymentViewController.h; sourceTree = "<group>"; };
 		5E2D867919DA53E600720362 /* DeploymentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeploymentViewController.m; sourceTree = "<group>"; };
 		5E8443711A5EFEA00085BD36 /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
@@ -78,9 +79,6 @@
 		5E8443741A5EFEA00085BD36 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVProgressHUD.bundle; sourceTree = "<group>"; };
 		5E8443751A5EFEA00085BD36 /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVProgressHUD.h; sourceTree = "<group>"; };
 		5E8443761A5EFEA00085BD36 /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVProgressHUD.m; sourceTree = "<group>"; };
-		5E84437A1A5EFEAD0085BD36 /* Rigablue.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Rigablue.xcodeproj; path = ../rigablue/iOS/Rigablue.xcodeproj; sourceTree = "<group>"; };
-		5E8695371A5DEB4D00D75EFF /* bmd-ware-secure.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "bmd-ware-secure.bin"; path = "RigablueTest/Firmware/bmd-ware-secure.bin"; sourceTree = "<group>"; };
-		5E8695391A5DF75600D75EFF /* bmd-ware-no-key.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "bmd-ware-no-key.bin"; path = "RigablueTest/Firmware/bmd-ware-no-key.bin"; sourceTree = "<group>"; };
 		5E9414FE19DD0FB60046FEEF /* RigDfuExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RigDfuExample-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -89,7 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5E8443831A5EFF5F0085BD36 /* libRigablue.a in Frameworks */,
+				4C9808401D345F660082FE48 /* libRigablue.a in Frameworks */,
 				2032206119071AE300DAA3FB /* CoreBluetooth.framework in Frameworks */,
 				2032202A1907196500DAA3FB /* CoreGraphics.framework in Frameworks */,
 				2032202C1907196500DAA3FB /* UIKit.framework in Frameworks */,
@@ -113,7 +111,7 @@
 		2032201B1907196500DAA3FB = {
 			isa = PBXGroup;
 			children = (
-				5E84437A1A5EFEAD0085BD36 /* Rigablue.xcodeproj */,
+				4C9808361D345F300082FE48 /* Rigablue.xcodeproj */,
 				5E8443701A5EFEA00085BD36 /* SVProgressHUD */,
 				5E2E886619D20D0E0030600A /* Firmware */,
 				2032202D1907196500DAA3FB /* RigablueTest */,
@@ -169,12 +167,20 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		4C9808371D345F300082FE48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C98083D1D345F300082FE48 /* libRigablue.a */,
+				4C98083F1D345F300082FE48 /* RigablueTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5E2E886619D20D0E0030600A /* Firmware */ = {
 			isa = PBXGroup;
 			children = (
-				5E8695391A5DF75600D75EFF /* bmd-ware-no-key.bin */,
-				5E8695371A5DEB4D00D75EFF /* bmd-ware-secure.bin */,
-				5E17C7A91A54C37B00FAF1B2 /* bmd-ware-eval.bin */,
+				4C9808311D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin */,
+				4C9808321D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin */,
 			);
 			name = Firmware;
 			sourceTree = "<group>";
@@ -191,15 +197,6 @@
 			);
 			name = SVProgressHUD;
 			path = ../SVProgressHUD/SVProgressHUD;
-			sourceTree = "<group>";
-		};
-		5E84437B1A5EFEAD0085BD36 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				5E8443801A5EFEAD0085BD36 /* libRigablue.a */,
-				5E8443821A5EFEAD0085BD36 /* RigablueTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,7 +247,7 @@
 				ORGANIZATIONNAME = "Rigado, LLC";
 				TargetAttributes = {
 					203220231907196500DAA3FB = {
-						DevelopmentTeam = G4HW4JEJP2;
+						DevelopmentTeam = 5PJX36PFW7;
 					};
 					203220441907196500DAA3FB = {
 						TestTargetID = 203220231907196500DAA3FB;
@@ -270,8 +267,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 5E84437B1A5EFEAD0085BD36 /* Products */;
-					ProjectRef = 5E84437A1A5EFEAD0085BD36 /* Rigablue.xcodeproj */;
+					ProductGroup = 4C9808371D345F300082FE48 /* Products */;
+					ProjectRef = 4C9808361D345F300082FE48 /* Rigablue.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -283,18 +280,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		5E8443801A5EFEAD0085BD36 /* libRigablue.a */ = {
+		4C98083D1D345F300082FE48 /* libRigablue.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRigablue.a;
-			remoteRef = 5E84437F1A5EFEAD0085BD36 /* PBXContainerItemProxy */;
+			remoteRef = 4C98083C1D345F300082FE48 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		5E8443821A5EFEAD0085BD36 /* RigablueTests.xctest */ = {
+		4C98083F1D345F300082FE48 /* RigablueTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = RigablueTests.xctest;
-			remoteRef = 5E8443811A5EFEAD0085BD36 /* PBXContainerItemProxy */;
+			remoteRef = 4C98083E1D345F300082FE48 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -305,12 +302,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E8443781A5EFEA00085BD36 /* SVProgressHUD.bundle in Resources */,
+				4C9808331D345DDA0082FE48 /* bmd200_blinky_demo_ota.bin in Resources */,
 				203220401907196500DAA3FB /* Images.xcassets in Resources */,
+				4C9808341D345DDA0082FE48 /* eval_demo_1_0_0_ota.bin in Resources */,
 				203220321907196500DAA3FB /* InfoPlist.strings in Resources */,
 				2032203B1907196500DAA3FB /* Main.storyboard in Resources */,
-				5E17C7AA1A54C37B00FAF1B2 /* bmd-ware-eval.bin in Resources */,
-				5E86953A1A5DF75600D75EFF /* bmd-ware-no-key.bin in Resources */,
-				5E8695381A5DEB4D00D75EFF /* bmd-ware-secure.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
