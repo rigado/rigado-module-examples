@@ -39,7 +39,7 @@
 
 /* TODO: Update this command to be the command you want to send to make the application force the device reboot in to the bootloader. 
  * Whatever this command is, it will be written to the characteristic as defined above. */
-static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
+static uint8_t bootloader_command[] = { 0xa1, 0xfc, 0xd6, 0xe7 };
 
 @interface DeploymentViewController () <RigLeDiscoveryManagerDelegate, RigLeConnectionManagerDelegate, RigLeBaseDeviceDelegate, UIPickerViewDataSource, UIPickerViewDelegate, RigFirmwareUpdateManagerDelegate>
 {
@@ -69,6 +69,12 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     
     uint8_t mac_addr[6];
 }
+
+@property (strong, nonatomic) CBUUID *serviceUuid;
+@property (strong, nonatomic) CBUUID *controlPointUuid;
+@property (strong, nonatomic) CBService *service;
+@property (strong, nonatomic) CBCharacteristic *controlPoint;
+
 @end
 
 @implementation DeploymentViewController
@@ -83,11 +89,11 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     [RigLeConnectionManager sharedInstance].delegate = self;
     
     /* TODO: Firmware list will be displayed to the user.  Provide a useful string for the name of the binary. */
-    firmwareList = [NSArray arrayWithObjects:@"BMDware Eval", nil];
+    firmwareList = @[@"eval_demo_1_0_0_ota", @"bmd200_blinky_demo_ota"];
     /* TODO: Create an array listing that matches the name of the firmware image added to the project.  The file must be of type .bin
      * Note: DO NOT add the file extention (e.g. bin) as it will be handled later
      */
-    firmwareBinaryList = [NSArray arrayWithObjects:@"bmd-ware-no-key", nil];
+    firmwareBinaryList = @[@"eval_demo_1_0_0_ota", @"bmd200_blinky_demo_ota"];
     
     CAGradientLayer *bgLayer = [self blueGradient];
     bgLayer.frame = self.view.bounds;
@@ -115,7 +121,10 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
 
 - (void)startDiscovery
 {
-    NSArray *uuidList = [NSArray arrayWithObjects:[CBUUID UUIDWithString:RIGDFU_SERVICE_ID], /*[CBUUID UUIDWithString:RESET_SERVICE],*/ nil];
+    /* TODO: Update to use your service and characteristic UUIDs */
+    self.serviceUuid = [CBUUID UUIDWithString:@"50db1523-418d-4690-9589-ab7be9e22684"];
+    self.controlPointUuid = [CBUUID UUIDWithString:@"50db1527-418d-4690-9589-ab7be9e22684"];
+    NSArray *uuidList = [NSArray arrayWithObjects:self.serviceUuid, self.controlPointUuid, [CBUUID UUIDWithString:RIGDFU_SERVICE_ID], nil];
     RigDeviceRequest *request = [RigDeviceRequest deviceRequestWithUuidList:uuidList timeout:20.0f delegate:self allowDuplicates:NO];
     [self showHudWithStatus:@"Searching..."];
     
@@ -232,37 +241,33 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     if (isAlreadyBootloader) {
         /* This path is for when only the bootloader is present on the device. */
         /* Invoke bootloader here with pointer to binary image of firmware. */
-        [updateManager updateFirmware:updateDevice Image:firmwareImageData ImageSize:(uint32_t)firmwareImageData.length activateChar:nil activateCommand:nil activateCommandLen:0];
+        RigFirmwareUpdateRequest *request = [RigFirmwareUpdateRequest updateRequestWithDevice:updateDevice image:firmwareImageData activationChar:nil activationCommand:nil maxRssi:RSSI_UPDATE_THRESHOLD];
+        [updateManager performUpdate:request];
         isUpdateInProgress = YES;
         return;
     }
     
-    CBService *service = nil;
-    CBCharacteristic *controlPoint = nil;
-    
-    /* TODO: Update to use your service and characteristic UUIDs */
-    CBUUID *serviceUuid = [CBUUID UUIDWithString:RESET_SERVICE];
-    CBUUID *controlPointUuid = [CBUUID UUIDWithString:RESET_CHAR];
-    
     for (CBService *svc in [updateDevice getSerivceList]) {
-        if ([svc.UUID isEqual:serviceUuid]) {
-            service = svc;
+        if ([svc.UUID isEqual:self.serviceUuid]) {
+            self.service = svc;
             break;
         }
     }
     
-    if (service != nil) {
-        for (CBCharacteristic *characteristic in service.characteristics) {
-            if ([characteristic.UUID isEqual:controlPointUuid]) {
-                controlPoint = characteristic;
+    if (self.service != nil) {
+        for (CBCharacteristic *characteristic in self.service.characteristics) {
+            if ([characteristic.UUID isEqual:self.controlPointUuid]) {
+                self.controlPoint = characteristic;
                 break;
             }
         }
     }
     
-    if (controlPoint != nil) {
+    if (self.controlPoint != nil) {
         /* Invoke bootloader here with pointer to binary image of firmware. */
-        [updateManager updateFirmware:updateDevice Image:firmwareImageData ImageSize:(uint32_t)firmwareImageData.length activateChar:controlPoint activateCommand:bootloader_command activateCommandLen:sizeof(bootloader_command)];
+        NSData *data = [NSData dataWithBytes:bootloader_command length:4];
+        RigFirmwareUpdateRequest *request = [RigFirmwareUpdateRequest updateRequestWithDevice:updateDevice image:firmwareImageData activationChar:self.controlPoint activationCommand:data maxRssi:-65];
+        [updateManager performUpdate:request];
         isUpdateInProgress = YES;
     } else {
         _deploymentStatus.text = @"No Control Point Found!!!";
@@ -477,6 +482,9 @@ static uint8_t bootloader_command[] = { 0x03, 0x56, 0x30, 0x57 };
     //request data from server??
     isConnected = YES;
     [self performSelectorOnMainThread:@selector(displayUpdateDeviceData) withObject:nil waitUntilDone:YES];
+    // set Service and Control Point Characteristic
+    self.service = [device getServiceWithUuid:self.serviceUuid];
+    self.controlPoint = [device getCharacteristicWithUuid:self.controlPointUuid forService:self.service];
 }
 
 - (void)didUpdateNotifyStateForCharacteristic:(CBCharacteristic *)characteristic forDevice:(RigLeBaseDevice *)device
