@@ -49,6 +49,8 @@ public class Utilities {
                     try {
                         strMfgName = characteristic.getStringValue(0);
                     }catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "Characteristic for strMfgName was null");
                         // do nothing, just don't crash.
                     }
                 }
@@ -58,7 +60,10 @@ public class Utilities {
         return strMfgName == null ? strUnknown : strMfgName;// on null return strUnknown
     }
 
-    public void startFirmwareUpdate(Context context, RigFirmwareUpdateManager fwManager, RigLeBaseDevice device, JsonFirmwareType firmwareRecord,
+    public void startFirmwareUpdate(Context context,
+                                    RigFirmwareUpdateManager fwManager,
+                                    RigLeBaseDevice device,
+                                    JsonFirmwareType firmwareRecord,
                                     BluetoothGattCharacteristic bootCharacteristic, byte [] bootCommand) {
 
         if (firmwareRecord != null){

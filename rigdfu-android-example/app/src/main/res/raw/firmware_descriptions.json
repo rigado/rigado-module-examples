@@ -1,12 +1,22 @@
 [
     {
-        "fwname": "my_build",
+        "fwname": "EvalDemo 1_0_0",
         "properties": {
             "version": 0.1,
             "build": 0,
-            "filename1": "my_build_file_name",
+            "filename1": "eval_demo_1_0_0_ota.bin",
             "filename2": "",
-            "comment": "in the fw filename above, the .bin extension is not necessary. note: update the above with your build file"
+            "comment": "Update the above with your build file"
+        }
+    },
+    {
+        "fwname": "Blinky Demo",
+        "properties": {
+            "version": 1.0,
+            "build": 0,
+            "filename": "bmd200_blinky_demo_ota.bin",
+            "filename2": "",
+            "comment": "the .bin extension is necessary if you store your firmware in assets"
         }
     }
 ]

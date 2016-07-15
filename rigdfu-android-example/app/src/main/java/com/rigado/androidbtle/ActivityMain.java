@@ -264,15 +264,8 @@ public class ActivityMain extends ActionBarActivity
         showStatus(R.string.txt_tv_status_idle);
     }
 
-
     @Override
-    public void displayUnplugMessage() {
-
-    }
-
-
-    @Override
-    public void dismissUnplugAlert() {
+    public void updateFailed(int error) {
 
     }
     // end: Concrete implementations for the IRigFirmwareUpdateManagerObserver interface
