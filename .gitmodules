@@ -4,3 +4,7 @@
 [submodule "SVProgressHUD"]
 	path = SVProgressHUD
 	url = git@github.com:TransitApp/SVProgressHUD.git
+[submodule "rigdfu-android-example/libs/rigablue"]
+	path = rigdfu-android-example/libs/rigablue
+	url = https://git.rigado.com/modules/rigablue.git
+	branch = android-fw-300
