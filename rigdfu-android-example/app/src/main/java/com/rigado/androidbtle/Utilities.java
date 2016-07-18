@@ -3,6 +3,9 @@ package com.rigado.androidbtle;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.rigado.rigablue.RigFirmwareUpdateManager;
@@ -20,6 +23,12 @@ public class Utilities {
     private final String TAG = getClass().getSimpleName();
     private final String UUID_DIS_SERVICE = "0000180a";//leading characters in UUID
     private final String UUID_MFG_NAME = "00002a29";//leading characters in UUID
+
+    //If Marshmallow or above, check if permission has been granted
+    public static boolean hasPermission(Context context, String permission) {
+        return Build.VERSION.SDK_INT<23 ||
+                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
 
     /**
      * attempt to obtain the manufacturer name
