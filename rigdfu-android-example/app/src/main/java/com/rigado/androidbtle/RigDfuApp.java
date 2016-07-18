@@ -6,9 +6,9 @@ import com.rigado.rigablue.RigCoreBluetooth;
 
 /**
  * Initialize the application
- * NOTE: be sure to add this class to your manifest with android:name=".ApplicationMain"
+ * NOTE: be sure to add this class to your manifest with android:name=".RigDfuApp"
  */
-public class ApplicationMain extends Application {
+public class RigDfuApp extends Application {
 
     @Override
     public void onCreate() {

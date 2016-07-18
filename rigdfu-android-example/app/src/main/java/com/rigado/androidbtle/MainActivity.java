@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionGroupInfo;
 import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -52,7 +53,6 @@ public class MainActivity extends ActionBarActivity
     private final String TAG = getClass().getSimpleName();
     private final static String BTLE_SERVICE_UUID = "00001530-1212-efde-1523-785feabcd123";
 
-    private final static int BTLE_SEARCH_TIMEOUT_MS = 20000;//20sec
     private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10sec
     private final static String BTLE_DEFAULT_DEVICE_NAME = "RigDfu";
 
@@ -150,7 +150,7 @@ public class MainActivity extends ActionBarActivity
         int id = item.getItemId();
 
         if (id == R.id.id_menu_search) {
-            checkForPermissions();
+            scanForDevicesIfAllowed();
             return true;
         }
 
@@ -412,7 +412,7 @@ public class MainActivity extends ActionBarActivity
             return;
         }
 
-        checkForPermissions(); //always check permissions before scanning
+        scanForDevicesIfAllowed(); //always check permissions before scanning
     }
 
     @Override
@@ -429,88 +429,39 @@ public class MainActivity extends ActionBarActivity
     }
     // end: Concrete implementation for the IRigLeDiscoveryManagerObserver interface
 
-    //region PERMISSIONS_CHECK
+    private final static int BTLE_SEARCH_TIMEOUT_MS = 20000;//20sec
 
-    //Set up location permission request
-    private final String[] locationPermission = {Manifest.permission.ACCESS_COARSE_LOCATION};
-    private final static int LOCATION_REQUEST_CODE = 101;
+    private void scanForDevicesIfAllowed() {
+        if(!Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            loadPermissionsActivity();
+        } else if(!locationIsEnabled()) {
+            enableLocation();
+        } else {
+            discoverStartBTLEdevice(BTLE_SEARCH_TIMEOUT_MS);
+        }
+    }
+
+    private boolean locationIsEnabled() {
+        boolean enabled = false;
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
+                manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            enabled = true;
+        }
+
+        return enabled;
+    }
+
     private final static int LOCATION_RESULT_CODE = 0x0F;
 
-    private void checkForPermissions() {
-        /**
-         * Apps installed on Android devices with API 6.0+ require Location permissions and for
-         * Location to be turned on to discover devices. Location is a dangerous permission,
-         * and users can revoke permissions or turn it off at any time.
-         * Apps should always check for permissions before beginning the discovery process.
-         *
-         * https://developer.android.com/training/permissions/requesting.html
-         *
-         * https://code.google.com/p/android/issues/detail?id=189090&q=ble%20android%206.0&colspec=ID%20Type%20Status%20Owner%20Summary%20Stars
-         *
-         * */
-        if(Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            //If we already have permission, check if location is turned on
-            checkLocationStatus();
-
-        } else {
-            //Else, if we do not have permission, & the user has previously denied our request,
-            // show a dialog explaining why we need access to location.
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                alertUserPermissionRequestRationale();
-            } else {
-                //Else, request access to location
-                ActivityCompat.requestPermissions(this, locationPermission, LOCATION_REQUEST_CODE);
-            }
-
-        }
+    private void enableLocation() {
+        Toast.makeText(this, "Please turn on location to scan for devices.", Toast.LENGTH_LONG).show();
+        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), LOCATION_RESULT_CODE);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_REQUEST_CODE:
-                if(grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //If permission was granted, check if Location is turned on before loading UI
-                    checkLocationStatus();
-                } else {
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                        //If permission was denied, explain why we need access to location
-                        alertUserPermissionRequestRationale();
-                    } else {
-                        //The user has permanently denied access and will have to manually
-                        //update their Settings to connect.
-                        Toast.makeText(MainActivity.this, "Please enable location services to connect.", Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-        }
+    private void loadPermissionsActivity() {
+        Intent intent = new Intent(this, PermissionsActivity.class);
+        startActivity(intent);
+        finish(); //clear backstack
     }
-
-    private void checkLocationStatus() {
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if(manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            discoverStartBTLEdevice(BTLE_SEARCH_TIMEOUT_MS);
-        } else {
-            //If location is not enabled, send the user to Settings
-            Toast.makeText(this, "Please turn on location to scan for devices.", Toast.LENGTH_LONG).show();
-            startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), LOCATION_RESULT_CODE);
-        }
-    }
-
-    private void alertUserPermissionRequestRationale() {
-        new AlertDialog.Builder(this)
-                .setTitle("BLE Scanning Unavailable")
-                .setMessage("Devices running Marshmallow or higher require Location services to scan for BLE devices. Please enable location to continue.")
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        //Once we have explained why we need access to Location, request it again
-                        ActivityCompat.requestPermissions(MainActivity.this, locationPermission, LOCATION_REQUEST_CODE);
-                    }
-                })
-                .show();
-    }
-
-    //endregion
 }
