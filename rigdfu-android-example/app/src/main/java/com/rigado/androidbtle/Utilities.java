@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -28,6 +29,17 @@ public class Utilities {
     public static boolean hasPermission(Context context, String permission) {
         return Build.VERSION.SDK_INT<23 ||
                 ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static boolean isLocationEnabled(Context context) {
+        boolean enabled = false;
+        LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if(manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
+                manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            enabled = true;
+        }
+
+        return enabled;
     }
 
     /**

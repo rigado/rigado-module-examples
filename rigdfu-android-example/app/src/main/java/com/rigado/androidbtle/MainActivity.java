@@ -4,9 +4,7 @@ import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -45,7 +43,7 @@ public class MainActivity extends ActionBarActivity
     // constants
     private final String TAG = getClass().getSimpleName();
 
-    private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10sec
+    private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10 sec
     private final static String BTLE_DEFAULT_DEVICE_NAME = "RigDfu";
 
     /*TODO: This threshold can be raised to force devices to be within close proximity of the Android
@@ -53,11 +51,11 @@ public class MainActivity extends ActionBarActivity
     private final static int RSSI_UPDATE_THRESHOLD = -128;
 
     //TODO: Update the following strings to match the UUIDs of your custom service
-    private static final String BTLE_DEVICE_SERVICE = "50db1523-418d-4690-9589-ab7be9e22684";
-    private static final String BTLE_DEVICE_CTRL_POINT = "50db1527-418d-4690-9589-ab7be9e22684";
+    private final static String BTLE_SERVICE_UUID = "00001530-1212-efde-1523-785feabcd123"; //RigDfu
+    private static final String BTLE_CONTROL_POINT_UUID = "00001531-1212-efde-1523-785feabcd123";
 
     //TODO: Update this command to match the reset command for your device
-    private final static byte [] bootloader_command = { -95, -4, -42, -25 };
+    private final static byte [] bootloader_command = { 0x03, 0x56, 0x30, 0x57 };
 
     // members
     private RigFirmwareUpdateManager mRigFirmwareUpdateManager;
@@ -149,8 +147,6 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private static final String FIRMWARE_DEBUG = "FIRMWARE_DEBUG";
-
     @Override
     public void onClick(View view) {
         if (view == mButtonDeploy) {
@@ -177,7 +173,7 @@ public class MainActivity extends ActionBarActivity
 
         for(BluetoothGattService service : mRigLeBaseDevice.getServiceList()) {
             switch (service.getUuid().toString()) {
-                case BTLE_DEVICE_SERVICE:
+                case BTLE_SERVICE_UUID:
                     resetService = service;
                     break;
             }
@@ -189,21 +185,18 @@ public class MainActivity extends ActionBarActivity
             return;
         }
 
-        resetChar = resetService.getCharacteristic(UUID.fromString(BTLE_DEVICE_CTRL_POINT));
+        resetChar = resetService.getCharacteristic(UUID.fromString(BTLE_CONTROL_POINT_UUID));
         if(resetChar == null) {
             Toast.makeText(getApplicationContext(), "Bluetooth characteristic for Reset command not found!", Toast.LENGTH_LONG).show();
             return;
         }
 
-
-        Log.d("FIRMWARE_DEBUG", "firmwareRecord " + firmwareRecord);
-        if(Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) && locationIsEnabled()) {
+        //part of the firmware update process may require scanning
+        if(Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) && Utilities.isLocationEnabled(this)) {
             mUtilities.startFirmwareUpdate(this, mRigFirmwareUpdateManager, mRigLeBaseDevice, firmwareRecord, resetChar, bootloader_command);
             mIsUpdateInProgress = true;
         } else {
-            Intent intent = new Intent(this, PermissionsActivity.class);
-            startActivity(intent);
-            finish();
+            loadPermissionsActivity();
         }
 
     }
@@ -233,7 +226,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void discoverStartBTLEdevice(int timeout) {
-        RigDeviceRequest request = new RigDeviceRequest(new String[] {BTLE_DEVICE_SERVICE}, timeout);
+        RigDeviceRequest request = new RigDeviceRequest(new String[] {BTLE_SERVICE_UUID}, timeout);
         request.setObserver(this);
         RigLeDiscoveryManager.getInstance().startDiscoverDevices(request);
         // NOTE: next expected callback to trigger is likely to be didDiscoverDevice()
@@ -441,31 +434,12 @@ public class MainActivity extends ActionBarActivity
     private final static int BTLE_SEARCH_TIMEOUT_MS = 20000;//20sec
 
     private void scanForDevicesIfAllowed() {
-        if(!Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+        if(!Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                !Utilities.isLocationEnabled(this)) {
             loadPermissionsActivity();
-        } else if(!locationIsEnabled()) {
-            enableLocation();
         } else {
             discoverStartBTLEdevice(BTLE_SEARCH_TIMEOUT_MS);
         }
-    }
-
-    private boolean locationIsEnabled() {
-        boolean enabled = false;
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if(manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
-                manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            enabled = true;
-        }
-
-        return enabled;
-    }
-
-    private final static int LOCATION_RESULT_CODE = 0x0F;
-
-    private void enableLocation() {
-        Toast.makeText(this, "Please turn on location to scan for devices.", Toast.LENGTH_LONG).show();
-        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), LOCATION_RESULT_CODE);
     }
 
     private void loadPermissionsActivity() {
