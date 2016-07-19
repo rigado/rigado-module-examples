@@ -30,6 +30,7 @@ import com.rigado.rigablue.RigLeConnectionManager;
 import com.rigado.rigablue.RigLeDiscoveryManager;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -146,6 +147,7 @@ public class MainActivity extends ActionBarActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onClick(View view) {
@@ -385,7 +387,7 @@ public class MainActivity extends ActionBarActivity
     // Concrete implementation for the IRigLeDiscoveryManagerObserver interface
     @Override
     public void didDiscoverDevice(RigAvailableDeviceData device) {
-        Log.d("DISCOVERY_DEBUG", "didDiscoverDevice " + device.getBluetoothDevice().getName());
+
         if (mIsConnectionInProgress) {
             return;
         }

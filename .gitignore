@@ -5,7 +5,6 @@
 xcshareddata/
 xcuserdata/
 project.xcworkspace/
-Firmware/
 build
 gen
 .project
