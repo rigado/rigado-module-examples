@@ -5,17 +5,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.PermissionGroupInfo;
 import android.location.LocationManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +32,6 @@ import com.rigado.rigablue.RigLeConnectionManager;
 import com.rigado.rigablue.RigLeDiscoveryManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -51,7 +44,6 @@ public class MainActivity extends ActionBarActivity
 
     // constants
     private final String TAG = getClass().getSimpleName();
-    private final static String BTLE_SERVICE_UUID = "00001530-1212-efde-1523-785feabcd123";
 
     private final static int BTLE_CONNECT_TIMEOUT_MS = 10000;//10sec
     private final static String BTLE_DEFAULT_DEVICE_NAME = "RigDfu";
@@ -61,11 +53,11 @@ public class MainActivity extends ActionBarActivity
     private final static int RSSI_UPDATE_THRESHOLD = -128;
 
     //TODO: Update the following strings to match the UUIDs of your custom service
-    private final static String RESET_SERVICE_UUID_STRING = "2413B33F-707F-90BD-2045-2AB8807571B7";
-    private final static String RESET_CHARACTERISTIC_UUID_STRING = "2413B43F-707F-90BD-2045-2AB8807571B7";
+    private static final String BTLE_DEVICE_SERVICE = "50db1523-418d-4690-9589-ab7be9e22684";
+    private static final String BTLE_DEVICE_CTRL_POINT = "50db1527-418d-4690-9589-ab7be9e22684";
 
     //TODO: Update this command to match the reset command for your device
-    private final static byte [] bootloader_command = { 0x03, 0x56, 0x30, 0x57 };
+    private final static byte [] bootloader_command = { -95, -4, -42, -25 };
 
     // members
     private RigFirmwareUpdateManager mRigFirmwareUpdateManager;
@@ -109,7 +101,7 @@ public class MainActivity extends ActionBarActivity
         /* TODO: Update raw or assets folder to contain your binary and update firmware_descriptions.json to have
            the necessary information regarding the update binary.  Note: Update binaries must be
            binary files generated using the genimage.py Python script.  See Getting Started with the
-           Rigado Secure Bootlaoder for more details.
+           Rigado Secure Bootloader for more details.
          */
         mJsonFirmwareReader = new JsonFirmwareReader();
         mJsonFirmwareTypeList = mJsonFirmwareReader.getFirmwareList(this);
@@ -157,6 +149,7 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private static final String FIRMWARE_DEBUG = "FIRMWARE_DEBUG";
 
     @Override
     public void onClick(View view) {
@@ -165,38 +158,54 @@ public class MainActivity extends ActionBarActivity
                 // it's null if there's no connection so show a message to connect first
                 Toast.makeText(getApplicationContext(), R.string.txt_error_device_not_connected, Toast.LENGTH_LONG).show();
             } else {
-                // get selected firmware from picker
-                final int selectedIndex = mFirmwarePicker.getValue();
-                final JsonFirmwareType firmwareRecord = mJsonFirmwareTypeList.get(selectedIndex);
-                // initialize FW Manager
-                mRigFirmwareUpdateManager = new RigFirmwareUpdateManager();
-                mRigFirmwareUpdateManager.setObserver(this);
-
-                BluetoothGattService resetService = null;
-                BluetoothGattCharacteristic resetChar = null;
-
-                for(BluetoothGattService service : mRigLeBaseDevice.getServiceList()) {
-                    if(service.getUuid().equals(UUID.fromString(RESET_SERVICE_UUID_STRING))) {
-                        resetService = service;
-                        break;
-                    }
-                }
-
-                if(resetService == null) {
-                    Toast.makeText(getApplicationContext(), "Bluetooth service for Reset command not found!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                resetChar = resetService.getCharacteristic(UUID.fromString(RESET_CHARACTERISTIC_UUID_STRING));
-                if(resetChar == null) {
-                    Toast.makeText(getApplicationContext(), "Bluetooth characteristic for Reset command not found!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                mUtilities.startFirmwareUpdate(this, mRigFirmwareUpdateManager, mRigLeBaseDevice, firmwareRecord, resetChar, bootloader_command);
-                mIsUpdateInProgress = true;
+                updateFirmware();
             }
         }
+    }
+
+    private void updateFirmware() {
+        // get selected firmware from picker
+        final int selectedIndex = mFirmwarePicker.getValue();
+        final JsonFirmwareType firmwareRecord = mJsonFirmwareTypeList.get(selectedIndex);
+
+        // initialize FW Manager
+        mRigFirmwareUpdateManager = new RigFirmwareUpdateManager();
+        mRigFirmwareUpdateManager.setObserver(this);
+
+        BluetoothGattService resetService = null;
+        BluetoothGattCharacteristic resetChar = null;
+
+        for(BluetoothGattService service : mRigLeBaseDevice.getServiceList()) {
+            switch (service.getUuid().toString()) {
+                case BTLE_DEVICE_SERVICE:
+                    resetService = service;
+                    break;
+            }
+
+        }
+
+        if(resetService == null) {
+            Toast.makeText(getApplicationContext(), "Bluetooth service for Reset command not found!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        resetChar = resetService.getCharacteristic(UUID.fromString(BTLE_DEVICE_CTRL_POINT));
+        if(resetChar == null) {
+            Toast.makeText(getApplicationContext(), "Bluetooth characteristic for Reset command not found!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+
+        Log.d("FIRMWARE_DEBUG", "firmwareRecord " + firmwareRecord);
+        if(Utilities.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) && locationIsEnabled()) {
+            mUtilities.startFirmwareUpdate(this, mRigFirmwareUpdateManager, mRigLeBaseDevice, firmwareRecord, resetChar, bootloader_command);
+            mIsUpdateInProgress = true;
+        } else {
+            Intent intent = new Intent(this, PermissionsActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
     }
 
 
@@ -224,7 +233,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void discoverStartBTLEdevice(int timeout) {
-        RigDeviceRequest request = new RigDeviceRequest(new String[] { BTLE_SERVICE_UUID, RESET_SERVICE_UUID_STRING }, timeout);
+        RigDeviceRequest request = new RigDeviceRequest(new String[] {BTLE_DEVICE_SERVICE}, timeout);
         request.setObserver(this);
         RigLeDiscoveryManager.getInstance().startDiscoverDevices(request);
         // NOTE: next expected callback to trigger is likely to be didDiscoverDevice()
@@ -383,7 +392,7 @@ public class MainActivity extends ActionBarActivity
     // Concrete implementation for the IRigLeDiscoveryManagerObserver interface
     @Override
     public void didDiscoverDevice(RigAvailableDeviceData device) {
-
+        Log.d("DISCOVERY_DEBUG", "didDiscoverDevice " + device.getBluetoothDevice().getName());
         if (mIsConnectionInProgress) {
             return;
         }

@@ -77,7 +77,7 @@ public class Utilities {
 
         if (firmwareRecord != null){
 
-            final String filename = firmwareRecord.getProperties().getFilename1();
+            final String filename = firmwareRecord.getProperties().getFilename2();
 
             // ensure that the filenames contain no extension
             String strFilenameNoExt1;
@@ -86,12 +86,15 @@ public class Utilities {
             } else {
                 strFilenameNoExt1 = filename;
             }
-
             final int deviceFWid = context.getResources().getIdentifier(strFilenameNoExt1, "raw", context.getPackageName());
+            Log.d("FIRMWARE_DEBUG", "id " + deviceFWid);
 
-            InputStream fwImageInputStream = (deviceFWid != 0) ? context.getResources().openRawResource(deviceFWid) : null;
-
-            fwManager.updateFirmware(device, fwImageInputStream, bootCharacteristic, bootCommand);
+            InputStream fwImageInputStream = context.getResources().openRawResource(deviceFWid);
+            if(fwImageInputStream!=null) {
+                fwManager.updateFirmware(device, fwImageInputStream, bootCharacteristic, bootCommand);
+            }else {
+                Log.e(TAG, "Firmware input stream returned null. Were the JSON values read correctly?");
+            }
         } else {
             Log.e(TAG, "Firmware filenames are unknown - were the JSON values read correctly?");
         }

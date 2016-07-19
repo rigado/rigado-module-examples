@@ -5,7 +5,7 @@
             "version": 0.1,
             "build": 0,
             "filename1": "eval_demo_1_0_0_ota.bin",
-            "filename2": "",
+            "filename2": "eval_demo_1_0_0_ota.bin",
             "comment": "Update the above with your build file"
         }
     },
@@ -15,7 +15,7 @@
             "version": 1.0,
             "build": 0,
             "filename": "bmd200_blinky_demo_ota.bin",
-            "filename2": "",
+            "filename2": "bmd200_blinky_demo_ota.bin",
             "comment": "the .bin extension is necessary if you store your firmware in assets"
         }
     }
